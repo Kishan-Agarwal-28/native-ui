@@ -3,8 +3,8 @@ name: Deploy native-ui backend
 on:
   push:
     branches:
-      - prod:backend
-      - prod:all
+      - prod/backend
+      - prod/all
 
 jobs:
   deploy:

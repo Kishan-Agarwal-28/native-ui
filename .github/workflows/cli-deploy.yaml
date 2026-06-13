@@ -3,8 +3,8 @@ name: Build and Deploy native-ui CLI
 on:
   push:
     branches:
-      - prod:cli
-      - prod:all
+      - prod/cli
+      - prod/all
 
 jobs:
   deploy:

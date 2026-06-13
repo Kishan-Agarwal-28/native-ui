@@ -3,8 +3,8 @@ name: Deploy native-ui showcase
 on:
   push:
     branches:
-      - prod:showcase
-      - prod:all
+      - prod/showcase
+      - prod/all
 
 concurrency:
   group: showcase-deploy-${{ github.ref }}

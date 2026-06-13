@@ -3,8 +3,8 @@ name: Deploy native-ui docs
 on:
   push:
     branches:
-      - prod:docs
-      - prod:all
+      - prod/docs
+      - prod/all
 
 concurrency:
   group: netlify-deploy-${{ github.ref }}
