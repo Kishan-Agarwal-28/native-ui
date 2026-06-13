@@ -36,9 +36,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build and Deploy Docs to Netlify
+      - name: Deploy docs to Netlify 
         run: |
-          cd apps/docs
           pnpm --package=netlify-cli@latest dlx netlify deploy \
             --prod \
             --build \
