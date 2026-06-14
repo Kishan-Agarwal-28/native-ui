@@ -35,13 +35,13 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Build and Deploy Docs to Netlify
+      - name: install netlify cli
+        run: pnpm install -g netlify-cli
+      - name: Deploy docs to Netlify
         run: |
-          cd apps/docs
-          pnpm --package=netlify-cli@latest dlx netlify deploy \
+          netlify deploy \
             --prod \
-            --build \
+            --filter @repo/docs \
             --site "$NETLIFY_SITE_ID" \
             --auth "$NETLIFY_AUTH_TOKEN" \
             --message "Docs deployed via GitHub Actions"
