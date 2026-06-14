@@ -13,11 +13,13 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     permissions:
       contents: read
     env:
       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
       NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SHOWCASE_SITE_ID }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,14 +38,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Setup Turborepo GitHub cache
+        uses: rharkor/caching-for-turbo@v2.3.13
+
       - name: Build Expo Web
-        run: pnpm --filter @repo/showcase build
+        run: pnpm turbo run build --filter=@repo/showcase
+
+      - name: Install netlify CLI
+        run: pnpm add -g netlify-cli
 
       - name: Deploy to Netlify
         run: |
-          pnpm --package=netlify-cli@latest dlx netlify deploy \
+          netlify deploy \
             --prod \
-            --filter @repo/showcase \
             --no-build \
             --dir=apps/showcase/dist \
             --site "$NETLIFY_SITE_ID" \

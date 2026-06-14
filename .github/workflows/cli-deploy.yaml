@@ -6,31 +6,42 @@ on:
       - prod/cli
       - prod/all
 
+concurrency:
+  group: cli-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
       id-token: write 
-      contents: read  
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: 22
           registry-url: 'https://registry.npmjs.org'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Setup Turborepo GitHub cache
+        uses: rharkor/caching-for-turbo@v2.3.13
+
       - name: Build CLI
-        run: pnpm run build --filter nativeui-cli
+        run: pnpm turbo run build --filter=nativeui-cli
 
       - name: Publish to npm
         working-directory: ./apps/cli
