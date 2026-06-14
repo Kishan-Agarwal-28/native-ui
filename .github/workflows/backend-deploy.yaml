@@ -33,5 +33,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: apps/backend
+          workingDirectory: ./apps/backend
           packageManager: pnpm
+          command: deploy --config wrangler.jsonc --minify
