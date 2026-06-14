@@ -1,6 +1,6 @@
 [build]
   publish = ".next"
-  command = "cd ../.. && pnpm turbo run build --filter @repo/docs"
+  command = "cd ../.. && TURBO_FORCE=1 pnpm turbo run build --filter @repo/docs"
 
 [build.environment]
   NODE_VERSION = "22"
@@ -8,11 +8,6 @@
 [functions]
   directory = ".netlify/functions-internal"
   node_bundler = "esbuild"
-
-[dev]
-  framework = "#custom"
-  command = "pnpm dev"
-  port = 3000
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
