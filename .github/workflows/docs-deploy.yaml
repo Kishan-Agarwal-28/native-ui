@@ -35,10 +35,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
+      - name: install netlify cli
+        run: pnpm install -g netlify-cli
       - name: Deploy docs to Netlify
         run: |
-          pnpm exec netlify deploy \
+          netlify deploy \
             --prod \
             --filter @repo/docs \
             --site "$NETLIFY_SITE_ID" \
