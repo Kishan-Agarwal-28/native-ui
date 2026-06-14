@@ -1,3 +1,6 @@
 [build]
   publish = ".next"
   command = "cd ../.. && pnpm turbo run build --filter @repo/docs"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
