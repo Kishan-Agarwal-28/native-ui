@@ -43,6 +43,7 @@ jobs:
         run: |
           pnpm --package=netlify-cli@latest dlx netlify deploy \
             --prod \
+            --repo @repo/showcase \
             --no-build \
             --dir=apps/showcase/dist \
             --site "$NETLIFY_SITE_ID" \
