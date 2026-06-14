@@ -38,9 +38,9 @@ jobs:
 
       - name: Deploy docs to Netlify
         run: |
-          cd apps/docs
           pnpm exec netlify deploy \
             --prod \
+            --filter @repo/docs \
             --site "$NETLIFY_SITE_ID" \
             --auth "$NETLIFY_AUTH_TOKEN" \
             --message "Docs deployed via GitHub Actions"
