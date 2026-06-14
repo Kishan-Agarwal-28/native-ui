@@ -1,5 +1,5 @@
 {
-  "name": "@repo/showcase",
+  "name": "ui-dev",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -8,12 +8,10 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint",
-    "build": "expo export --platform web --output-dir dist"
+    "lint": "expo lint"
   },
   "dependencies": {
-    "@expo/vector-icons": "^15.1.1",
-    "@radix-ui/react-dialog": "^1.1.15",
+    "@expo/vector-icons": "^15.0.2",
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@react-navigation/elements": "^2.9.10",
     "@react-navigation/native": "^7.1.33",
