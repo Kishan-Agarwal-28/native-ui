@@ -1,9 +1,0 @@
-[build]
-  publish = ".next"
-  command = "cd ../.. && TURBO_FORCE=1 pnpm turbo run build --filter @repo/docs"
-
-[build.environment]
-  NODE_VERSION = "22"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
