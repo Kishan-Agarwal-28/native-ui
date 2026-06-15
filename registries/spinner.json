@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "spinner",
+  "type": "registry:component",
+  "title": "Spinner",
+  "description": "Spinner component",
+  "registryDependencies": [],
+  "dependencies": ["react-native-reanimated"],
+  "category": "feedback",
+  "files": [
+    {
+      "path": "components/ui/spinner.tsx",
+      "type": "registry:component",
+      "target": "components/ui/spinner.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport { forwardRef, useEffect } from \"react\";\nimport { View, type ViewProps, type ViewStyle, type StyleProp, } from \"react-native\";\nimport Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming, } from \"react-native-reanimated\";\ntype SpinnerSize = \"sm\" | \"default\" | \"lg\" | number;\ntype SpinnerProps = {\n    size?: SpinnerSize;\n    color?: string;\n    thickness?: number;\n    style?: StyleProp<ViewStyle>;\n} & Omit<ViewProps, \"style\">;\nconst getSize = (size: SpinnerSize, spacing: any): number => {\n    if (typeof size === \"number\")\n        return size;\n    switch (size) {\n        case \"sm\":\n            return spacing.lg;\n        case \"lg\":\n            return spacing.xl * 2;\n        case \"default\":\n        default:\n            return spacing.xl;\n    }\n};\nconst Spinner = forwardRef<View, SpinnerProps>(({ size = \"default\", color, thickness, accessibilityLabel = \"Loading...\", style, ...rest }, ref) => {\n    const { theme } = useTheme();\n    const { colors, spacing } = THEME[theme];\n    const resolvedSize = getSize(size, spacing);\n    const resolvedThickness = thickness ?? Math.max(2, resolvedSize * 0.1);\n    const resolvedColor = color ?? colors.primary;\n    const rotation = useSharedValue(0);\n    useEffect(() => {\n        rotation.value = withRepeat(withTiming(360, {\n            duration: 800,\n            easing: Easing.linear,\n        }), -1, false);\n    }, [rotation]);\n    const animatedStyle = useAnimatedStyle(() => ({\n        transform: [{ rotate: `${rotation.value}deg` }],\n    }));\n    const spinnerStyle: ViewStyle = {\n        width: resolvedSize,\n        height: resolvedSize,\n        borderRadius: resolvedSize / 2,\n        borderWidth: resolvedThickness,\n        borderColor: colors.border,\n        borderTopColor: resolvedColor,\n        borderRightColor: resolvedColor,\n    };\n    return (<Animated.View ref={ref} accessibilityRole=\"progressbar\" accessibilityLabel={accessibilityLabel} accessibilityState={{ busy: true }} {...rest} style={[spinnerStyle, animatedStyle, style]}/>);\n});\nSpinner.displayName = \"Spinner\";\nexport default Spinner;"
+    }
+  ]
+}

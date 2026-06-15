@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "avatar",
+  "type": "registry:component",
+  "title": "Avatar",
+  "description": "Avatar component",
+  "registryDependencies": [],
+  "dependencies": [],
+  "category": "primitives",
+  "files": [
+    {
+      "path": "components/ui/avatar.tsx",
+      "type": "registry:component",
+      "target": "components/ui/avatar.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport { forwardRef, useState } from \"react\";\nimport { Image, Text, View, type ViewProps } from \"react-native\";\nexport const AvatarFallback = forwardRef<View, ViewProps>(({ style, children, ...rest }, ref) => {\n    return (<View ref={ref} style={[\n            {\n                flex: 1,\n                width: \"100%\",\n                height: \"100%\",\n                justifyContent: \"center\",\n                alignItems: \"center\",\n            },\n            style,\n        ]} {...rest}>\n        {children}\n      </View>);\n});\nAvatarFallback.displayName = \"AvatarFallback\";\ntype AvatarProps = {\n    name: string;\n    picture?: string;\n    size?: number;\n    children?: React.ReactNode;\n} & Omit<ViewProps, \"style\">;\nconst getInitials = (name: string) => {\n    const words = name.trim().split(/\\s+/);\n    if (!words[0])\n        return \"\";\n    return words\n        .slice(0, 2)\n        .map((w) => w[0].toUpperCase())\n        .join(\"\");\n};\nexport const Avatar = forwardRef<View, AvatarProps>(({ name, picture, size = 40, accessibilityLabel, children, ...rest }, ref) => {\n    const [error, setError] = useState<boolean>(false);\n    const { theme } = useTheme();\n    const { colors } = THEME[theme];\n    const initials = getInitials(name);\n    const fontSize = size * 0.35;\n    const borderRadius = size / 2;\n    const renderFallback = () => {\n        if (children) {\n            return children;\n        }\n        return (<Text style={{\n                color: colors.primaryForeground,\n                fontSize,\n                fontWeight: \"700\",\n                letterSpacing: 0.5,\n            }} importantForAccessibility=\"no\" accessibilityElementsHidden>\n          {initials}\n        </Text>);\n    };\n    return (<View ref={ref} accessibilityRole=\"image\" accessibilityLabel={accessibilityLabel ?? name} {...rest} style={{\n            width: size,\n            height: size,\n            borderRadius,\n            backgroundColor: colors.primary,\n            justifyContent: \"center\",\n            alignItems: \"center\",\n            overflow: \"hidden\",\n        }}>\n        {picture && !error ? (<Image source={{ uri: picture }} style={{ width: size, height: size, borderRadius }} resizeMode=\"cover\" importantForAccessibility=\"no\" accessibilityElementsHidden accessibilityIgnoresInvertColors onError={() => setError(true)}/>) : (renderFallback())}\n      </View>);\n});\nAvatar.displayName = \"Avatar\";"
+    }
+  ]
+}
