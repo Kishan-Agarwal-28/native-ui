@@ -44,9 +44,9 @@ export default async function Page(props: {
               {page.data.title}
             </DocsTitle>
             <div className="flex flex-row gap-2 items-center  pt-2 pb-6">
-              <MarkdownCopyButton markdownUrl={`${page.url}.mdx`} />
+              <MarkdownCopyButton markdownUrl={`${page.url}.md`} />
               <ViewOptionsPopover
-                markdownUrl={`${page.url}.mdx`}
+                markdownUrl={`${page.url}.md`}
                 githubUrl={`https://github.com/Kishan-Agarwal-28/native-ui/blob/main/apps/docs/content/docs/components/${page.path}`}
               />
             </div>
