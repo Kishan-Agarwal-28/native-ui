@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "skeleton",
+  "type": "registry:component",
+  "title": "Skeleton",
+  "description": "Skeleton component",
+  "registryDependencies": [],
+  "dependencies": ["react-native-reanimated"],
+  "category": "feedback",
+  "files": [
+    {
+      "path": "components/ui/skeleton.tsx",
+      "type": "registry:component",
+      "target": "components/ui/skeleton.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport React, { useEffect } from \"react\";\nimport { View, type ViewProps } from \"react-native\";\nimport Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, Easing, } from \"react-native-reanimated\";\nconst Skeleton = React.forwardRef<View, ViewProps>(({ style, ...props }, ref) => {\n    const { theme } = useTheme();\n    const { colors } = THEME[theme];\n    const backgroundColor = theme === \"dark\" ? \"#201f1f82\" : \"#d4d0d054\";\n    const opacity = useSharedValue(0.5);\n    useEffect(() => {\n        opacity.value = withRepeat(withSequence(withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }), withTiming(0.5, {\n            duration: 1000,\n            easing: Easing.inOut(Easing.ease),\n        })), -1, true);\n    }, [opacity]);\n    const animatedStyle = useAnimatedStyle(() => ({\n        opacity: opacity.value,\n    }));\n    return (<Animated.View ref={ref as any} style={[\n            {\n                backgroundColor,\n                borderRadius: 8,\n            },\n            animatedStyle,\n            style,\n        ]} {...props}/>);\n});\nSkeleton.displayName = \"Skeleton\";\nexport default Skeleton;"
+    }
+  ]
+}

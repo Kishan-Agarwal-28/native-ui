@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "field",
+  "type": "registry:component",
+  "title": "Field",
+  "description": "Field component",
+  "registryDependencies": [],
+  "dependencies": [],
+  "category": "forms",
+  "files": [
+    {
+      "path": "components/ui/field.tsx",
+      "type": "registry:component",
+      "target": "components/ui/field.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport * as React from \"react\";\nimport { View, Text, type ViewProps, type TextProps } from \"react-native\";\ntype FieldContextValue = {\n    id: string;\n    error?: string;\n    orientation: \"vertical\" | \"horizontal\";\n};\nconst FieldContext = React.createContext<FieldContextValue | null>(null);\nconst useField = () => {\n    const ctx = React.useContext(FieldContext);\n    if (!ctx)\n        throw new Error(\"Field components must be used within <Field>\");\n    return ctx;\n};\nconst FieldSet = ({ style, ...props }: ViewProps) => (<View style={[{ gap: 16 }, style]} {...props}/>);\nconst FieldLegend = ({ style, ...props }: TextProps) => {\n    const { theme } = useTheme();\n    return (<Text style={[\n            {\n                fontSize: 18,\n                fontWeight: \"700\",\n                color: THEME[theme].colors.foreground,\n            },\n            style,\n        ]} {...props}/>);\n};\nconst FieldGroup = ({ style, ...props }: ViewProps) => (<View style={[{ gap: 24 }, style]} {...props}/>);\ntype FieldProps = ViewProps & {\n    orientation?: \"vertical\" | \"horizontal\";\n    error?: string;\n};\nconst Field = ({ orientation = \"vertical\", error, style, children, ...props }: FieldProps) => {\n    const { theme } = useTheme();\n    const id = React.useId();\n    return (<FieldContext.Provider value={{ id, error, orientation }}>\n      <View style={[\n            {\n                flexDirection: orientation === \"horizontal\" ? \"row\" : \"column\",\n                alignItems: orientation === \"horizontal\" ? \"center\" : \"stretch\",\n                gap: orientation === \"horizontal\" ? 12 : 8,\n            },\n            style,\n        ]} {...props}>\n        {children}\n      </View>\n    </FieldContext.Provider>);\n};\nconst FieldLabel = ({ style, ...props }: TextProps) => {\n    const { theme } = useTheme();\n    return (<Text style={[\n            {\n                fontSize: 14,\n                fontWeight: \"500\",\n                color: THEME[theme].colors.foreground,\n            },\n            style,\n        ]} {...props}/>);\n};\nconst FieldDescription = ({ style, ...props }: TextProps) => {\n    const { theme } = useTheme();\n    return (<Text style={[\n            { fontSize: 12, color: THEME[theme].colors.mutedForeground },\n            style,\n        ]} {...props}/>);\n};\nconst FieldError = ({ style, ...props }: TextProps) => {\n    const { error } = useField();\n    const { theme } = useTheme();\n    if (!error)\n        return null;\n    return (<Text style={[{ fontSize: 12, color: THEME[theme].colors.destructive }, style]} {...props}>\n      {error}\n    </Text>);\n};\nconst FieldSeparator = ({ style, ...props }: ViewProps) => {\n    const { theme } = useTheme();\n    return (<View style={[\n            { height: 1, backgroundColor: THEME[theme].colors.border },\n            style,\n        ]} {...props}/>);\n};\nexport { FieldSet, FieldLegend, FieldGroup, Field, FieldLabel, FieldDescription, FieldError, FieldSeparator, };"
+    }
+  ]
+}

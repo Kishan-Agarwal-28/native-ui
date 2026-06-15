@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "progress",
+  "type": "registry:component",
+  "title": "Progress",
+  "description": "Progress component",
+  "registryDependencies": [],
+  "dependencies": ["react-native-reanimated"],
+  "category": "feedback",
+  "files": [
+    {
+      "path": "components/ui/progress.tsx",
+      "type": "registry:component",
+      "target": "components/ui/progress.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport { forwardRef, useEffect } from \"react\";\nimport { StyleSheet, View, type ViewProps } from \"react-native\";\nimport Animated, { useAnimatedStyle, useSharedValue, withSpring, } from \"react-native-reanimated\";\ntype ProgressProps = {\n    value?: number;\n} & ViewProps;\nconst PROGRESS_HEIGHT = 8;\nexport const Progress = forwardRef<View, ProgressProps>(({ value = 0, style, ...rest }, ref) => {\n    const { theme } = useTheme();\n    const { colors } = THEME[theme];\n    const clampedValue = Math.min(Math.max(value, 0), 100);\n    const animatedProgress = useSharedValue(clampedValue);\n    useEffect(() => {\n        animatedProgress.value = withSpring(clampedValue, {\n            mass: 0.3,\n            damping: 15,\n            stiffness: 120,\n        });\n    }, [clampedValue, animatedProgress]);\n    const indicatorAnimatedStyle = useAnimatedStyle(() => {\n        return {\n            width: `${animatedProgress.value}%`,\n        };\n    });\n    return (<View ref={ref} accessibilityRole=\"progressbar\" accessibilityValue={{\n            min: 0,\n            max: 100,\n            now: clampedValue,\n            text: `${clampedValue}% completed`,\n        }} {...rest} style={[\n            styles.track,\n            {\n                backgroundColor: colors.secondary,\n                height: PROGRESS_HEIGHT,\n                borderRadius: PROGRESS_HEIGHT / 2,\n            },\n            style,\n        ]}>\n        <Animated.View style={[\n            styles.indicator,\n            {\n                backgroundColor: colors.primary,\n                height: PROGRESS_HEIGHT,\n                borderRadius: PROGRESS_HEIGHT / 2,\n            },\n            indicatorAnimatedStyle,\n        ]}/>\n      </View>);\n});\nconst styles = StyleSheet.create({\n    track: {\n        width: \"100%\",\n        overflow: \"hidden\",\n    },\n    indicator: {\n        width: 0,\n    },\n});\nProgress.displayName = \"Progress\";\nexport default Progress;"
+    }
+  ]
+}

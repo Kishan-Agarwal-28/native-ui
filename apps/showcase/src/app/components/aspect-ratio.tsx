@@ -1,14 +1,363 @@
-import AspectRatio from '@/components/ui/aspect-ratio';
-import { Image } from 'react-native';
+import AspectRatio from "@/components/ui/aspect-ratio";
+import { DemoScreen, DemoSection } from "@/components/demo-screen";
+import { useTheme, THEME } from "@/lib/theme";
+import { View, Text, StyleSheet, Image, Platform } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
-export default function AspectRatioDemo() {
+type PhotoCardProps = {
+  image: string;
+  title: string;
+  subtitle: string;
+  ratio: number;
+};
+
+function PhotoCard({ image, title, subtitle, ratio }: PhotoCardProps) {
+  const { theme } = useTheme();
+  const { colors, spacing } = THEME[theme];
+
   return (
-    <AspectRatio ratio={16 / 9} style={{ width: '100%' }}>
-      <Image
-        source={{ uri: 'https://picsum.photos/800/450' }}
-        style={{ width: '100%', height: '100%', borderRadius: 12 }}
-        resizeMode="cover"
-      />
-    </AspectRatio>
+    <View style={{ flex: 1 }}>
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: "700",
+          color: colors.mutedForeground,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+          marginBottom: spacing.sm,
+        }}
+      >
+        {ratio === 1
+          ? "Square (1:1)"
+          : ratio === 16 / 9
+            ? "Landscape (16:9)"
+            : ratio === 4 / 5
+              ? "Portrait (4:5)"
+              : `${ratio.toFixed(2)}`}
+      </Text>
+      <AspectRatio
+        ratio={ratio}
+        style={{ width: "100%", borderRadius: 12, overflow: "hidden" }}
+      >
+        <Image
+          source={{ uri: image }}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="cover"
+        />
+      </AspectRatio>
+      <View style={{ marginTop: spacing.sm }}>
+        <Text
+          style={{ fontSize: 14, fontWeight: "600", color: colors.foreground }}
+        >
+          {title}
+        </Text>
+        <Text
+          style={{ fontSize: 12, color: colors.mutedForeground, marginTop: 2 }}
+        >
+          {subtitle}
+        </Text>
+      </View>
+    </View>
   );
 }
+
+function VideoThumbnail({
+  image,
+  duration,
+}: {
+  image: string;
+  duration: string;
+}) {
+  const { theme } = useTheme();
+  const { colors, spacing } = THEME[theme];
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: "700",
+          color: colors.mutedForeground,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+          marginBottom: spacing.sm,
+        }}
+      >
+        Video Thumbnail (16:9)
+      </Text>
+      <AspectRatio
+        ratio={16 / 9}
+        style={{ width: "100%", borderRadius: 12, overflow: "hidden" }}
+      >
+        <Image
+          source={{ uri: image }}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="cover"
+        />
+        <View
+          style={[styles.playButton, { backgroundColor: colors.background }]}
+        >
+          <Feather name="play" size={24} color={colors.foreground} />
+        </View>
+        <View
+          style={[
+            styles.duration,
+            {
+              backgroundColor: "rgba(0,0,0,0.7)",
+              position: "absolute",
+              bottom: spacing.sm,
+              right: spacing.sm,
+              paddingHorizontal: spacing.sm,
+              paddingVertical: spacing.xs / 2,
+              borderRadius: 4,
+            },
+          ]}
+        >
+          <Text style={{ fontSize: 12, fontWeight: "600", color: "#ffffff" }}>
+            {duration}
+          </Text>
+        </View>
+      </AspectRatio>
+    </View>
+  );
+}
+
+function ProfileAvatar({ image, size }: { image: string; size: number }) {
+  const { theme } = useTheme();
+  const { colors } = THEME[theme];
+
+  return (
+    <View style={{ alignItems: "center", gap: 12 }}>
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: "700",
+          color: colors.mutedForeground,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+        }}
+      >
+        {size}x{size} Square
+      </Text>
+      <View
+        style={{
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          overflow: "hidden",
+          borderWidth: 3,
+          borderColor: colors.primary,
+        }}
+      >
+        <AspectRatio ratio={1} style={{ width: "100%", height: "100%" }}>
+          <Image
+            source={{ uri: image }}
+            style={{ width: "100%", height: "100%" }}
+            resizeMode="cover"
+          />
+        </AspectRatio>
+      </View>
+    </View>
+  );
+}
+
+function InstagramGrid() {
+  const { theme } = useTheme();
+  const { colors, spacing } = THEME[theme];
+
+  const posts = [
+    { id: "1", image: "https://picsum.photos/seed/grid1/600/600", likes: 1243 },
+    { id: "2", image: "https://picsum.photos/seed/grid2/600/600", likes: 892 },
+    { id: "3", image: "https://picsum.photos/seed/grid3/600/600", likes: 2104 },
+  ];
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: "700",
+          color: colors.mutedForeground,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+          marginBottom: spacing.sm,
+        }}
+      >
+        Social Media Grid (1:1)
+      </Text>
+      <View style={{ flexDirection: "row", gap: 4 }}>
+        {posts.map((post) => (
+          <AspectRatio
+            key={post.id}
+            ratio={1}
+            style={{ flex: 1, borderRadius: 8, overflow: "hidden" }}
+          >
+            <Image
+              source={{ uri: post.image }}
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="cover"
+            />
+          </AspectRatio>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function CinematicPreview() {
+  const { theme } = useTheme();
+  const { colors, spacing } = THEME[theme];
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: "700",
+          color: colors.mutedForeground,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+          marginBottom: spacing.sm,
+        }}
+      >
+        Cinematic (21:9)
+      </Text>
+      <AspectRatio
+        ratio={21 / 9}
+        style={{ width: "100%", borderRadius: 12, overflow: "hidden" }}
+      >
+        <Image
+          source={{ uri: "https://picsum.photos/seed/cinematic/1260/540" }}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="cover"
+        />
+        <View
+          style={[
+            styles.cinematicOverlay,
+            { backgroundColor: "rgba(0,0,0,0.3)" },
+          ]}
+        >
+          <Text style={{ fontSize: 18, fontWeight: "700", color: "#ffffff" }}>
+            Cinematic Preview
+          </Text>
+          <Text
+            style={{
+              fontSize: 13,
+              color: "rgba(255,255,255,0.8)",
+              marginTop: 4,
+            }}
+          >
+            Ultra-wide panoramic view
+          </Text>
+        </View>
+      </AspectRatio>
+    </View>
+  );
+}
+
+export default function AspectRatioDemo() {
+  const { theme } = useTheme();
+  const { colors, spacing } = THEME[theme];
+
+  return (
+    <DemoScreen
+      title="Aspect Ratio"
+      description="Constrain content to a fixed width-to-height ratio for consistent layouts."
+    >
+      <DemoSection label="Photo Cards">
+        <View style={{ flexDirection: "row", gap: spacing.md }}>
+          <PhotoCard
+            image="https://picsum.photos/seed/photo1/800/800"
+            title="Mountain View"
+            subtitle="Nature photography"
+            ratio={1}
+          />
+        </View>
+        <View style={[styles.row, { marginTop: spacing.lg }]}>
+          <PhotoCard
+            image="https://picsum.photos/seed/photo2/1600/900"
+            title="Ocean Sunset"
+            subtitle="Landscape shot"
+            ratio={16 / 9}
+          />
+        </View>
+        <View style={[styles.row, { marginTop: spacing.lg }]}>
+          <PhotoCard
+            image="https://picsum.photos/seed/photo3/800/1000"
+            title="Portrait Mode"
+            subtitle="Studio photography"
+            ratio={4 / 5}
+          />
+        </View>
+      </DemoSection>
+
+      <DemoSection label="Video Thumbnails">
+        <VideoThumbnail
+          image="https://picsum.photos/seed/video/1280/720"
+          duration="12:34"
+        />
+      </DemoSection>
+
+      <DemoSection label="Profile Avatars">
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-around",
+            backgroundColor: colors.card,
+            borderRadius: 16,
+            padding: spacing.lg,
+          }}
+        >
+          <ProfileAvatar
+            image="https://picsum.photos/seed/avatar1/200/200"
+            size={64}
+          />
+          <ProfileAvatar
+            image="https://picsum.photos/seed/avatar2/200/200"
+            size={80}
+          />
+          <ProfileAvatar
+            image="https://picsum.photos/seed/avatar3/200/200"
+            size={96}
+          />
+        </View>
+      </DemoSection>
+
+      <DemoSection label="Social Media Grid">
+        <InstagramGrid />
+      </DemoSection>
+
+      <DemoSection label="Cinematic Format">
+        <CinematicPreview />
+      </DemoSection>
+    </DemoScreen>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+  },
+  playButton: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    ...Platform.select({
+      web: {
+        backgroundColor: "rgba(255,255,255,0.9)",
+      },
+    }),
+  },
+  duration: {},
+  cinematicOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+  },
+});

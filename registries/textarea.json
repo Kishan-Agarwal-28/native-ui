@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "textarea",
+  "type": "registry:component",
+  "title": "Textarea",
+  "description": "Textarea component",
+  "registryDependencies": [],
+  "dependencies": [],
+  "category": "forms",
+  "files": [
+    {
+      "path": "components/ui/textarea.tsx",
+      "type": "registry:component",
+      "target": "components/ui/textarea.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport * as React from \"react\";\nimport { Platform, TextInput, type TextInputProps, type ViewStyle, type TextStyle, } from \"react-native\";\nexport interface TextareaProps extends TextInputProps {\n    \"aria-invalid\"?: boolean;\n}\nconst Textarea = React.forwardRef<TextInput, TextareaProps>(({ style, \"aria-invalid\": ariaInvalid, editable = true, onFocus, onBlur, ...props }, ref) => {\n    const { theme } = useTheme();\n    const { colors, radius, typography } = THEME[theme];\n    const [isFocused, setIsFocused] = React.useState(false);\n    const handleFocus = (e: any) => {\n        setIsFocused(true);\n        onFocus?.(e);\n    };\n    const handleBlur = (e: any) => {\n        setIsFocused(false);\n        onBlur?.(e);\n    };\n    let borderColor = colors.border;\n    if (ariaInvalid) {\n        borderColor = colors.destructive;\n    }\n    else if (isFocused) {\n        borderColor = colors.ring;\n    }\n    return (<TextInput ref={ref} multiline textAlignVertical=\"top\" editable={editable} placeholderTextColor={colors.mutedForeground} onFocus={handleFocus} onBlur={handleBlur} style={[\n            {\n                minHeight: 64,\n                width: \"100%\",\n                borderRadius: radius.lg,\n                borderWidth: 1,\n                borderColor,\n                backgroundColor: !editable\n                    ? theme === \"dark\"\n                        ? \"rgba(255,255,255,0.05)\"\n                        : \"rgba(0,0,0,0.05)\"\n                    : \"transparent\",\n                paddingHorizontal: 10,\n                paddingVertical: 8,\n                fontSize: typography.base,\n                color: colors.foreground,\n                opacity: editable ? 1 : 0.5,\n            },\n            Platform.OS === \"web\" && ({ outlineStyle: \"none\" } as any),\n            style,\n        ]} {...props}/>);\n});\nTextarea.displayName = \"Textarea\";\nexport { Textarea };"
+    }
+  ]
+}
