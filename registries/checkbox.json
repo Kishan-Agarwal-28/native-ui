@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "checkbox",
+  "type": "registry:component",
+  "title": "Checkbox",
+  "description": "Checkbox component",
+  "registryDependencies": [],
+  "dependencies": ["@expo/vector-icons/AntDesign", "react-native-reanimated"],
+  "category": "forms",
+  "files": [
+    {
+      "path": "components/ui/checkbox.tsx",
+      "type": "registry:component",
+      "target": "components/ui/checkbox.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport { forwardRef, useEffect } from \"react\";\nimport AntDesign from \"@expo/vector-icons/AntDesign\";\nimport { Pressable, StyleSheet, type PressableProps, type View, } from \"react-native\";\nimport Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withSpring, withTiming, } from \"react-native-reanimated\";\ntype CheckboxProps = {\n    checked: boolean;\n    onCheckedChange: (checked: boolean) => void;\n    disabled?: boolean;\n} & Omit<PressableProps, \"style\" | \"onPress\">;\nconst CHECKBOX_SIZE = 24;\nexport const Checkbox = forwardRef<View, CheckboxProps>(({ checked = false, onCheckedChange, disabled = false, accessibilityLabel, accessibilityHint, ...rest }, ref) => {\n    const { theme } = useTheme();\n    const { colors, radius } = THEME[theme];\n    const progress = useSharedValue(checked ? 1 : 0);\n    useEffect(() => {\n        progress.value = withTiming(checked ? 1 : 0, { duration: 150 });\n    }, [checked, progress]);\n    const boxAnimatedStyle = useAnimatedStyle(() => {\n        return {\n            backgroundColor: interpolateColor(progress.value, [0, 1], [\"transparent\", colors.primary]),\n            borderColor: interpolateColor(progress.value, [0, 1], [colors.input, colors.primary]),\n        };\n    });\n    const checkIconAnimatedStyle = useAnimatedStyle(() => {\n        return {\n            opacity: progress.value,\n            transform: [\n                { scale: withSpring(checked ? 1 : 0, { mass: 0.5, damping: 12 }) },\n            ],\n        };\n    });\n    const handlePress = () => {\n        if (disabled)\n            return;\n        onCheckedChange?.(!checked);\n    };\n    return (<Pressable ref={ref} onPress={handlePress} disabled={disabled} accessibilityRole=\"checkbox\" accessibilityState={{ checked, disabled }} accessibilityLabel={accessibilityLabel ?? \"Checkbox\"} accessibilityHint={accessibilityHint ?? \"Toggles the checkbox state\"} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} {...rest} style={[\n            styles.container,\n            {\n                borderRadius: radius.sm,\n                opacity: disabled ? 0.5 : 1,\n            },\n        ]}>\n        <Animated.View style={[\n            StyleSheet.absoluteFillObject,\n            styles.animatedBox,\n            { borderRadius: radius.sm },\n            boxAnimatedStyle,\n        ]}/>\n        <Animated.View style={checkIconAnimatedStyle}>\n          <AntDesign name=\"check\" size={16} color={colors.primaryForeground} strokeWidth={3} importantForAccessibility=\"no\" accessibilityElementsHidden/>\n        </Animated.View>\n      </Pressable>);\n});\nconst styles = StyleSheet.create({\n    container: {\n        width: CHECKBOX_SIZE,\n        height: CHECKBOX_SIZE,\n        justifyContent: \"center\",\n        alignItems: \"center\",\n    },\n    animatedBox: {\n        borderWidth: 2,\n    },\n});\nCheckbox.displayName = \"Checkbox\";\nexport default Checkbox;"
+    }
+  ]
+}

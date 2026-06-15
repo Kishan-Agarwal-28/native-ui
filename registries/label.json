@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "label",
+  "type": "registry:component",
+  "title": "Label",
+  "description": "Label component",
+  "registryDependencies": ["typography"],
+  "dependencies": [],
+  "category": "typography",
+  "files": [
+    {
+      "path": "components/ui/label.tsx",
+      "type": "registry:component",
+      "target": "components/ui/label.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport Typography from \"@/components/ui/typography\";\nimport { forwardRef } from \"react\";\nimport { Text, type TextProps, type StyleProp, type TextStyle, } from \"react-native\";\ntype LabelProps = {\n    required?: boolean;\n    disabled?: boolean;\n    style?: StyleProp<TextStyle>;\n} & TextProps;\nexport const Label = forwardRef<Text, LabelProps>(({ children, required = false, disabled = false, style, accessibilityLabel, ...rest }, ref) => {\n    const { theme } = useTheme();\n    const { colors, spacing } = THEME[theme];\n    const requiredPhrase = required ? \"Required field\" : \"\";\n    const disabledPhrase = disabled ? \"Disabled\" : \"\";\n    const combinedStateText = [requiredPhrase, disabledPhrase]\n        .filter(Boolean)\n        .join(\", \");\n    const baseText = typeof children === \"string\" ? children : \"\";\n    const resolvedA11yLabel = accessibilityLabel ??\n        (combinedStateText ? `${baseText}, ${combinedStateText}` : undefined);\n    return (<Typography ref={ref} variant=\"label\" accessibilityRole=\"text\" accessibilityLabel={resolvedA11yLabel} accessibilityState={{ disabled }} {...rest} style={[\n            {\n                color: colors.foreground,\n                marginBottom: spacing.xs,\n            },\n            disabled && { opacity: 0.5 },\n            style,\n        ]}>\n        {children}\n        {required && (<Text style={{ color: colors.destructive }} importantForAccessibility=\"no\" accessibilityElementsHidden>\n            {\" *\"}\n          </Text>)}\n      </Typography>);\n});\nLabel.displayName = \"Label\";\nexport default Label;"
+    }
+  ]
+}

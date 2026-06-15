@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "badge",
+  "type": "registry:component",
+  "title": "Badge",
+  "description": "Badge component",
+  "registryDependencies": [],
+  "dependencies": [],
+  "category": "primitives",
+  "files": [
+    {
+      "path": "components/ui/badge.tsx",
+      "type": "registry:component",
+      "target": "components/ui/badge.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport { forwardRef } from \"react\";\nimport { Text, View, type ViewStyle, type TextStyle, type StyleProp, type ViewProps, } from \"react-native\";\ntype BadgeVariant = \"default\" | \"secondary\" | \"destructive\" | \"outline\" | \"ghost\";\ntype BadgeProps = {\n    label: string;\n    variant?: BadgeVariant;\n    icon?: React.ReactNode;\n    style?: StyleProp<ViewStyle>;\n    textStyle?: StyleProp<TextStyle>;\n} & Omit<ViewProps, \"style\">;\nconst Badge = forwardRef<View, BadgeProps>(({ label, variant = \"default\", icon, style, textStyle, accessibilityLabel, ...rest }, ref) => {\n    const { theme } = useTheme();\n    const { colors, spacing, radius } = THEME[theme];\n    const variantStyles: Record<BadgeVariant, {\n        container: ViewStyle;\n        text: TextStyle;\n    }> = {\n        default: {\n            container: {\n                backgroundColor: colors.primary,\n                borderColor: \"transparent\",\n            },\n            text: { color: colors.primaryForeground },\n        },\n        secondary: {\n            container: {\n                backgroundColor: colors.secondary,\n                borderColor: \"transparent\",\n            },\n            text: { color: colors.secondaryForeground },\n        },\n        destructive: {\n            container: {\n                backgroundColor: colors.destructive,\n                borderColor: \"transparent\",\n            },\n            text: { color: colors.destructiveForeground },\n        },\n        outline: {\n            container: {\n                backgroundColor: \"transparent\",\n                borderColor: colors.border,\n            },\n            text: { color: colors.foreground },\n        },\n        ghost: {\n            container: {\n                backgroundColor: colors.muted,\n                borderColor: \"transparent\",\n            },\n            text: { color: colors.mutedForeground },\n        },\n    };\n    const { container, text } = variantStyles[variant];\n    return (<View ref={ref} accessibilityRole=\"text\" accessibilityLabel={accessibilityLabel ?? label} {...rest} style={[\n            {\n                flexDirection: \"row\",\n                alignItems: \"center\",\n                alignSelf: \"flex-start\",\n                gap: spacing.xs,\n                paddingHorizontal: spacing.sm,\n                paddingVertical: 3,\n                borderRadius: radius.full,\n                borderWidth: 1,\n            },\n            container,\n            style,\n        ]}>\n        {icon}\n        <Text style={[\n            { fontSize: 12, fontWeight: \"600\", letterSpacing: 0.1 },\n            text,\n            textStyle,\n        ]} importantForAccessibility=\"no\" accessibilityElementsHidden>\n          {label}\n        </Text>\n      </View>);\n});\nBadge.displayName = \"Badge\";\nexport default Badge;"
+    }
+  ]
+}
