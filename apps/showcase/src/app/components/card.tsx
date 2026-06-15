@@ -6,26 +6,559 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from '@/components/ui/card';
-import Button from '@/components/ui/button';
-import { Text } from 'react-native';
+  CardAction,
+} from "@/components/ui/card";
+import { DemoScreen, DemoSection } from "@/components/demo-screen";
+import { useTheme, THEME } from "@/lib/theme";
+import { View, Text, StyleSheet, Image } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
-export default function CardDemo() {
+type PricingTier = {
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  features: string[];
+  highlighted?: boolean;
+  buttonText: string;
+};
+
+const pricingPlans: PricingTier[] = [
+  {
+    name: "Starter",
+    price: "$0",
+    period: "/month",
+    description: "Perfect for trying out the platform",
+    features: [
+      "3 projects",
+      "1GB storage",
+      "Community support",
+      "Basic analytics",
+    ],
+    buttonText: "Get Started",
+  },
+  {
+    name: "Pro",
+    price: "$29",
+    period: "/month",
+    description: "Best for small teams and startups",
+    features: [
+      "Unlimited projects",
+      "50GB storage",
+      "Priority support",
+      "Advanced analytics",
+      "API access",
+    ],
+    highlighted: true,
+    buttonText: "Start Free Trial",
+  },
+  {
+    name: "Enterprise",
+    price: "$99",
+    period: "/month",
+    description: "For large organizations",
+    features: [
+      "Everything in Pro",
+      "Unlimited storage",
+      "24/7 phone support",
+      "Custom integrations",
+      "SLA guarantee",
+    ],
+    buttonText: "Contact Sales",
+  },
+];
+
+type Product = {
+  id: string;
+  name: string;
+  price: string;
+  originalPrice?: string;
+  image: string;
+  badge?: string;
+};
+
+const products: Product[] = [
+  {
+    id: "1",
+    name: "Wireless Headphones",
+    price: "$149",
+    originalPrice: "$199",
+    image: "https://picsum.photos/seed/headphones/400/400",
+    badge: "Sale",
+  },
+  {
+    id: "2",
+    name: "Smart Watch Pro",
+    price: "$299",
+    image: "https://picsum.photos/seed/watch/400/400",
+  },
+  {
+    id: "3",
+    name: "Bluetooth Speaker",
+    price: "$79",
+    image: "https://picsum.photos/seed/speaker/400/400",
+    badge: "New",
+  },
+];
+
+function PricingCard({ plan }: { plan: PricingTier }) {
+  const { theme } = useTheme();
+  const { colors, spacing } = THEME[theme];
+
   return (
-    <Card>
+    <Card
+      style={
+        plan.highlighted
+          ? { borderColor: colors.primary, borderWidth: 2 }
+          : undefined
+      }
+    >
+      {plan.highlighted && (
+        <View
+          style={{
+            position: "absolute",
+            top: -12,
+            left: 0,
+            right: 0,
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: colors.primary,
+              paddingHorizontal: spacing.md,
+              paddingVertical: spacing.xs,
+              borderRadius: 12,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 11,
+                fontWeight: "700",
+                color: colors.background,
+              }}
+            >
+              MOST POPULAR
+            </Text>
+          </View>
+        </View>
+      )}
       <CardHeader>
         <CardTitleGroup>
-          <CardTitle>Card Title</CardTitle>
-          <CardDescription>Card description goes here.</CardDescription>
+          <CardTitle>{plan.name}</CardTitle>
+          <CardDescription>{plan.description}</CardDescription>
         </CardTitleGroup>
       </CardHeader>
       <CardContent>
-        <Text>Card body content.</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "baseline",
+            marginBottom: spacing.md,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 36,
+              fontWeight: "800",
+              color: colors.foreground,
+            }}
+          >
+            {plan.price}
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: colors.mutedForeground,
+              marginLeft: 4,
+            }}
+          >
+            {plan.period}
+          </Text>
+        </View>
+        <View style={{ gap: spacing.sm }}>
+          {plan.features.map((feature, i) => (
+            <View
+              key={i}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spacing.sm,
+              }}
+            >
+              <Feather name="check-circle" size={16} color={colors.primary} />
+              <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
+                {feature}
+              </Text>
+            </View>
+          ))}
+        </View>
       </CardContent>
       <CardFooter>
-        <Button title="Cancel" variant="outline" />
-        <Button title="Confirm" />
+        <View style={{ width: "100%" }}>
+          <View
+            style={[
+              styles.pricingButton,
+              {
+                backgroundColor: plan.highlighted
+                  ? colors.primary
+                  : "transparent",
+                borderColor: plan.highlighted ? colors.primary : colors.border,
+              },
+            ]}
+          >
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: "600",
+                color: plan.highlighted ? colors.background : colors.foreground,
+              }}
+            >
+              {plan.buttonText}
+            </Text>
+          </View>
+        </View>
       </CardFooter>
     </Card>
   );
 }
+
+function ProductCard({ product }: { product: Product }) {
+  const { theme } = useTheme();
+  const { colors, spacing } = THEME[theme];
+
+  return (
+    <Card>
+      <View style={{ position: "relative", marginBottom: spacing.md }}>
+        <Image
+          source={{ uri: product.image }}
+          style={{ width: "100%", height: 160, borderRadius: 8 }}
+          resizeMode="cover"
+        />
+        {product.badge && (
+          <View
+            style={{
+              position: "absolute",
+              top: spacing.sm,
+              left: spacing.sm,
+              backgroundColor:
+                product.badge === "Sale" ? "#ef4444" : colors.primary,
+              paddingHorizontal: spacing.sm,
+              paddingVertical: spacing.xs / 2,
+              borderRadius: 6,
+            }}
+          >
+            <Text style={{ fontSize: 11, fontWeight: "700", color: "#ffffff" }}>
+              {product.badge}
+            </Text>
+          </View>
+        )}
+      </View>
+      <CardContent style={{ paddingTop: 0 }}>
+        <Text
+          style={{ fontSize: 16, fontWeight: "600", color: colors.foreground }}
+        >
+          {product.name}
+        </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: spacing.sm,
+            marginTop: spacing.xs,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "700",
+              color: colors.foreground,
+            }}
+          >
+            {product.price}
+          </Text>
+          {product.originalPrice && (
+            <Text
+              style={{
+                fontSize: 14,
+                color: colors.mutedForeground,
+                textDecorationLine: "line-through",
+              }}
+            >
+              {product.originalPrice}
+            </Text>
+          )}
+        </View>
+      </CardContent>
+      <CardFooter>
+        <View style={{ flex: 1, flexDirection: "row", gap: spacing.sm }}>
+          <View
+            style={{
+              flex: 1,
+              paddingVertical: 10,
+              paddingHorizontal: 16,
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: colors.border,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "500",
+                color: colors.foreground,
+              }}
+            >
+              Add to Cart
+            </Text>
+          </View>
+          <View
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: colors.border,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Feather name="heart" size={18} color={colors.foreground} />
+          </View>
+        </View>
+      </CardFooter>
+    </Card>
+  );
+}
+
+function NotificationCard() {
+  const { theme } = useTheme();
+  const { colors, spacing } = THEME[theme];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitleGroup>
+          <CardTitle>Notifications</CardTitle>
+          <CardDescription>Manage how you receive alerts</CardDescription>
+        </CardTitleGroup>
+        <CardAction>
+          <View
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              backgroundColor: colors.muted,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Feather name="settings" size={16} color={colors.foreground} />
+          </View>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <View style={{ gap: spacing.md }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spacing.sm,
+              }}
+            >
+              <Feather
+                name="message-circle"
+                size={18}
+                color={colors.mutedForeground}
+              />
+              <Text style={{ fontSize: 14, color: colors.foreground }}>
+                Direct messages
+              </Text>
+            </View>
+            <View
+              style={{
+                width: 40,
+                height: 24,
+                borderRadius: 12,
+                backgroundColor: colors.primary,
+              }}
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spacing.sm,
+              }}
+            >
+              <Feather
+                name="at-sign"
+                size={18}
+                color={colors.mutedForeground}
+              />
+              <Text style={{ fontSize: 14, color: colors.foreground }}>
+                Mentions
+              </Text>
+            </View>
+            <View
+              style={{
+                width: 40,
+                height: 24,
+                borderRadius: 12,
+                backgroundColor: colors.primary,
+              }}
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: spacing.sm,
+              }}
+            >
+              <Feather name="users" size={18} color={colors.mutedForeground} />
+              <Text style={{ fontSize: 14, color: colors.foreground }}>
+                Group invitations
+              </Text>
+            </View>
+            <View
+              style={{
+                width: 40,
+                height: 24,
+                borderRadius: 12,
+                backgroundColor: colors.muted,
+              }}
+            />
+          </View>
+        </View>
+      </CardContent>
+    </Card>
+  );
+}
+
+function StatCard() {
+  const { theme } = useTheme();
+  const { colors, spacing } = THEME[theme];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitleGroup>
+          <CardTitle>Weekly Overview</CardTitle>
+          <CardDescription>Your activity summary</CardDescription>
+        </CardTitleGroup>
+        <CardAction>
+          <Feather name="trending-up" size={20} color={colors.primary} />
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <View style={{ flexDirection: "row", gap: spacing.lg }}>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 32,
+                fontWeight: "800",
+                color: colors.foreground,
+              }}
+            >
+              1,284
+            </Text>
+            <Text
+              style={{
+                fontSize: 13,
+                color: colors.mutedForeground,
+                marginTop: 2,
+              }}
+            >
+              Page views
+            </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 32,
+                fontWeight: "800",
+                color: colors.foreground,
+              }}
+            >
+              48
+            </Text>
+            <Text
+              style={{
+                fontSize: 13,
+                color: colors.mutedForeground,
+                marginTop: 2,
+              }}
+            >
+              New signups
+            </Text>
+          </View>
+        </View>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function CardDemo() {
+  return (
+    <DemoScreen
+      title="Card"
+      description="Versatile containers for grouping related content with headers, content areas, and actions."
+    >
+      <DemoSection label="Pricing Plans">
+        <View style={{ gap: 16 }}>
+          {pricingPlans.map((plan) => (
+            <PricingCard key={plan.name} plan={plan} />
+          ))}
+        </View>
+      </DemoSection>
+
+      <DemoSection label="Product Grid">
+        <View style={{ gap: 16 }}>
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </View>
+      </DemoSection>
+
+      <DemoSection label="Settings Card">
+        <NotificationCard />
+      </DemoSection>
+
+      <DemoSection label="Stats Card">
+        <StatCard />
+      </DemoSection>
+    </DemoScreen>
+  );
+}
+
+const styles = StyleSheet.create({
+  pricingButton: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: "center",
+  },
+});
