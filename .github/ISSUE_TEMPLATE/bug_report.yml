@@ -1,0 +1,135 @@
+name: "🐛 Bug Report"
+description: Something is broken. Tell us exactly what.
+title: "bug: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening — search existing issues. Duplicate reports slow everything down.
+
+  - type: input
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which component(s) is broken? Leave blank if it's the CLI or theme system.
+      placeholder: "e.g. button, input-otp, date-picker"
+    validations:
+      required: false
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Be specific. "It doesn't work" is not a bug report.
+      placeholder: "When I press the Button with variant='destructive' on Android, the ripple color ignores the theme token and renders as white."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should have happened?
+      placeholder: "The ripple color should use `colors.destructiveForeground` from lib/theme.ts."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: |
+        A code snippet or Expo Snack link that reproduces the issue. 
+        No reproduction = low priority. We can't fix what we can't see.
+      render: tsx
+      placeholder: |
+        import { Button } from '@/components/ui/button';
+
+        export default function App() {
+          return <Button variant="destructive">Delete</Button>;
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `nativeui-cli add button`
+        2. Use variant="destructive"
+        3. Run on Android device
+        4. Tap the button
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - iOS Simulator
+        - iOS Device
+        - Android Emulator
+        - Android Device
+        - Web (Expo)
+    validations:
+      required: true
+
+  - type: input
+    id: expo-version
+    attributes:
+      label: Expo SDK version
+      placeholder: "e.g. 52"
+    validations:
+      required: true
+
+  - type: input
+    id: nativeui-version
+    attributes:
+      label: nativeui-cli version
+      placeholder: "Run `nativeui-cli --version` and paste the output"
+    validations:
+      required: true
+
+  - type: input
+    id: rn-version
+    attributes:
+      label: React Native version
+      placeholder: "e.g. 0.76.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: regression
+    attributes:
+      label: Is this a regression?
+      description: Did this work in a previous version of NativeUI?
+      options:
+        - "Yes — it worked before"
+        - "No — never worked"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or error output
+      description: Metro bundler errors, runtime exceptions, anything useful.
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true
+        - label: I am using the component source copied via `nativeui-cli add`, not a modified version
+          required: false
+        - label: I can reproduce this on the latest CLI version
+          required: true
