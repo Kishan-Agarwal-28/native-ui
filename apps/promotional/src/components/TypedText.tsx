@@ -1,87 +1,82 @@
 import React from "react";
-import { useCurrentFrame, interpolate } from "remotion";
-import { colors } from "../utils/colors";
+import { useCurrentFrame } from "remotion";
 
-const cursorStyle: React.CSSProperties = {
-  display: "inline-block",
-  width: 2,
-  height: "1em",
-  backgroundColor: colors.accent,
-  marginLeft: 2,
-  verticalAlign: "text-bottom",
-};
-
-interface TypedTextProps {
+interface TypedLine {
   text: string;
-  startFrame: number;
-  charsPerFrame?: number;
-  style?: React.CSSProperties;
-  showCursor?: boolean;
-  cursorStyle?: React.CSSProperties;
+  color?: string;
+  delay?: number;
 }
 
-function getPauseAtNewline(line: string): number {
-  if (line === "") return 4;
-  if (line.startsWith("$")) return 8;
-  if (line.startsWith("✔") || line.startsWith("✓") || line.startsWith("✗"))
-    return 12;
-  return 4;
+interface TypedTextProps {
+  lines: TypedLine[];
+  startFrame: number;
+  speed?: number; // chars per frame
+  cursor?: boolean;
+  cursorColor?: string;
+  fontSize?: number;
+  lineHeight?: number;
+  fontFamily?: string;
 }
 
 export const TypedText: React.FC<TypedTextProps> = ({
-  text,
+  lines,
   startFrame,
-  charsPerFrame = 3,
-  style,
-  showCursor = true,
-  cursorStyle: cursorOverride,
+  speed = 2,
+  cursor = true,
+  cursorColor = "#a78bfa",
+  fontSize = 15,
+  lineHeight = 1.8,
+  fontFamily = '"JetBrains Mono", monospace',
 }) => {
   const frame = useCurrentFrame();
-  const elapsed = frame - startFrame;
+  const elapsed = Math.max(0, frame - startFrame);
+  const totalChars = lines.reduce((sum, line) => sum + line.text.length + 1, 0); // +1 for newline
+  const typedSoFar = Math.floor(elapsed * speed);
 
-  if (elapsed < 0) return <span style={style} />;
-
-  let totalChars = 0;
-  const lines = text.split("\n");
+  let remaining = typedSoFar;
+  const rendered: { chars: string; color: string }[] = [];
 
   for (const line of lines) {
-    const pause = getPauseAtNewline(line);
-    const lineChars = line.length + 1;
-    const needed = Math.ceil(lineChars / charsPerFrame) + pause;
-    const lineFrames = needed;
-    if (elapsed < totalChars / charsPerFrame + lineFrames) {
-      const lineElapsed = elapsed - totalChars / charsPerFrame;
-      const lineProgress = Math.max(0, Math.floor(lineElapsed * charsPerFrame));
-      const visible = text.slice(
-        0,
-        text.indexOf(line) + Math.min(lineProgress, line.length + 1),
-      );
-      const cursorVisible =
-        showCursor && text.indexOf(line) + lineProgress <= text.length;
-      return (
-        <span style={style}>
-          {visible}
-          {cursorVisible ? (
-            <span style={{ ...cursorStyle, ...cursorOverride }} />
-          ) : null}
-        </span>
-      );
+    const lineDelay = line.delay ?? 0;
+    if (remaining < lineDelay) {
+      break;
     }
-    totalChars += lineFrames * charsPerFrame;
+    const lineChars = Math.min(line.text.length, remaining - lineDelay);
+    if (lineChars > 0) {
+      rendered.push({
+        chars: line.text.slice(0, lineChars),
+        color: line.color ?? "#fafafa",
+      });
+    }
+    remaining -= lineDelay + line.text.length + 1;
+    if (lineChars < line.text.length) {
+      break;
+    }
   }
 
+  const isDone = typedSoFar >= totalChars;
+  const showCursor = cursor && (!isDone || Math.floor(frame / 15) % 2 === 0);
+
   return (
-    <span style={style}>
-      {text}
-      {showCursor ? (
-        <span
-          style={{
-            ...cursorStyle,
-            ...cursorOverride,
-            opacity: interpolate(frame % 30, [0, 15, 30], [1, 0, 1]),
-          }}
-        />
-      ) : null}
-    </span>
+    <div
+      style={{
+        fontFamily,
+        fontSize,
+        lineHeight: `${lineHeight}em`,
+        whiteSpace: "pre-wrap",
+      }}
+    >
+      {rendered.map((line, i) => (
+        <div key={i} style={{ color: line.color }}>
+          {line.chars}
+          {i === rendered.length - 1 && showCursor && (
+            <span style={{ color: cursorColor }}>▊</span>
+          )}
+        </div>
+      ))}
+      {rendered.length === 0 && showCursor && (
+        <span style={{ color: cursorColor }}>▊</span>
+      )}
+    </div>
   );
 };

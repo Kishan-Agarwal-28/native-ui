@@ -1,19 +1,22 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import PromoVideo from "./PromoVideo";
+import { PromoVideo } from "./PromoVideo";
 
-const SquareVariant: React.FC = () => {
+export const SquareVariant: React.FC = () => {
   return (
-    <AbsoluteFill style={{ overflow: "hidden" }}>
+    <AbsoluteFill
+      style={{
+        overflow: "hidden",
+        backgroundColor: "#09090b",
+      }}
+    >
       <div
         style={{
           position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%) scale(0.5625)",
+          left: -420,
+          top: 0,
           width: 1920,
           height: 1080,
-          transformOrigin: "center center",
         }}
       >
         <PromoVideo />
@@ -21,5 +24,3 @@ const SquareVariant: React.FC = () => {
     </AbsoluteFill>
   );
 };
-
-export default SquareVariant;

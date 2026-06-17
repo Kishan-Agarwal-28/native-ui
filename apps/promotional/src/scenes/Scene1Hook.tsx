@@ -1,132 +1,156 @@
 import React from "react";
 import {
-  AbsoluteFill,
   useCurrentFrame,
-  interpolate,
-  spring,
   useVideoConfig,
+  interpolate,
+  AbsoluteFill,
 } from "remotion";
-import { colors } from "../utils/colors";
-
-const tagline = "Stop fighting your component library.";
-const words = tagline.split(" ");
-
-const dotGridStyle: React.CSSProperties = {
-  position: "absolute",
-  inset: 0,
-  backgroundImage:
-    "radial-gradient(rgba(167,139,250,0.12) 1px, transparent 1px)",
-  backgroundSize: "32px 32px",
-  opacity: 0.6,
-};
+import { C } from "../utils/colors";
+import { CRTText } from "../components/CRTText";
+import { Glow } from "../components/Glow";
+import { fadeIn, slideIn } from "../utils/animations";
 
 const Scene1Hook: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { width, height } = useVideoConfig();
+  const f = frame;
 
-  const bgFade = interpolate(frame, [0, 30], [0, 1], {
+  const subtitleOpacity = fadeIn(f, 60, 20);
+  const lineWidth = interpolate(f, [40, 70], [0, 120], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const dotsFade = interpolate(frame, [15, 45], [0, 0.8], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  const subtitleOpacity = interpolate(frame, [160, 200], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const subtitleSlide = interpolate(
-    spring({
-      fps,
-      frame: frame - 160,
-      config: { damping: 16, stiffness: 140, mass: 0.8 },
-    }),
-    [0, 1],
-    [20, 0],
-  );
 
   return (
-    <AbsoluteFill style={{ backgroundColor: colors.bg, opacity: bgFade }}>
-      <div style={dotGridStyle as React.CSSProperties} />
+    <AbsoluteFill
+      style={{
+        backgroundColor: C.bg,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: '"Inter", sans-serif',
+        overflow: "hidden",
+      }}
+    >
+      {/* Ambient glow */}
+      <Glow
+        x={width / 2}
+        y={height / 2}
+        color={C.accent}
+        radius={400}
+        opacity={0.1}
+        animated
+      />
+
+      {/* Center content */}
       <div
         style={{
-          position: "absolute",
-          inset: 0,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
           alignItems: "center",
-          gap: 24,
+          zIndex: 10,
         }}
       >
+        {/* Main title */}
+        <CRTText
+          text="NATIVEUI"
+          startFrame={0}
+          charsPerFrame={2.5}
+          color={C.text}
+          size={96}
+          weight={700}
+          ghost
+          style={{ letterSpacing: -2, lineHeight: 1 }}
+        />
+
+        {/* Decorative line */}
         <div
           style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            maxWidth: 900,
-            gap: "0 12px",
+            width: lineWidth,
+            height: 2,
+            backgroundColor: C.accent,
+            marginTop: 24,
+            marginBottom: 24,
+            boxShadow: `0 0 16px ${C.accent}80`,
           }}
-        >
-          {words.map((word, i) => {
-            const wordStart = 40 + i * 12;
-            const s = spring({
-              fps,
-              frame: frame - wordStart,
-              config: { damping: 12, stiffness: 180, mass: 0.6 },
-              from: 1.2,
-              to: 1,
-            });
-            const opacity = interpolate(
-              frame,
-              [wordStart, wordStart + 8],
-              [0, 1],
-              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-            );
-            const translateY = interpolate(s, [1, 1.2], [0, -20]);
+        />
 
-            return (
-              <span
-                key={i}
-                style={{
-                  fontFamily: "'Inter', system-ui, sans-serif",
-                  fontSize: 58,
-                  fontWeight: 700,
-                  color: colors.text,
-                  opacity,
-                  transform: `scale(${s}) translateY(${translateY}px)`,
-                  display: "inline-block",
-                  letterSpacing: "-0.03em",
-                  textShadow: "0 0 40px rgba(167,139,250,0.15)",
-                }}
-              >
-                {word}
-              </span>
-            );
-          })}
-        </div>
-
+        {/* Subtitle */}
         <div
           style={{
             opacity: subtitleOpacity,
-            transform: `translateY(${subtitleSlide}px)`,
+            transform: `translateY(${interpolate(f, [60, 80], [20, 0], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            })}px)`,
           }}
         >
           <span
             style={{
-              fontFamily: "'Inter', system-ui, sans-serif",
-              fontSize: 26,
-              fontWeight: 500,
-              color: colors.accent,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
+              fontSize: 24,
+              fontWeight: 400,
+              color: C.sub,
+              letterSpacing: 0.5,
             }}
           >
-            Own it instead.
+            Beautiful React Native components
           </span>
         </div>
+
+        {/* Platform pills */}
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            marginTop: 40,
+            opacity: fadeIn(f, 100, 25),
+          }}
+        >
+          {["iOS", "Android", "Web"].map((platform, i) => (
+            <div
+              key={platform}
+              style={{
+                padding: "8px 18px",
+                borderRadius: 20,
+                border: `1px solid ${C.border}`,
+                backgroundColor: "rgba(255,255,255,0.02)",
+                color: C.muted,
+                fontSize: 13,
+                fontWeight: 500,
+                letterSpacing: 0.5,
+                opacity: fadeIn(f, 110 + i * 10, 15),
+                transform: `translateY(${interpolate(
+                  f,
+                  [110 + i * 10, 130 + i * 10],
+                  [12, 0],
+                  { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+                )}px)`,
+              }}
+            >
+              {platform}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Version badge */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 60,
+          right: 80,
+          opacity: fadeIn(f, 140, 20),
+        }}
+      >
+        <span
+          style={{
+            fontSize: 13,
+            color: C.dim,
+            fontFamily: '"JetBrains Mono", monospace',
+          }}
+        >
+          v1.0
+        </span>
       </div>
     </AbsoluteFill>
   );

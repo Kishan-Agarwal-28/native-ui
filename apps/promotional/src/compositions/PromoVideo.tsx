@@ -1,75 +1,41 @@
 import React from "react";
-import { AbsoluteFill, Sequence } from "remotion";
+import { Sequence, AbsoluteFill } from "remotion";
 import Scene1Hook from "../scenes/Scene1Hook";
-import Scene2Problem from "../scenes/Scene2Problem";
-import Scene3Solution from "../scenes/Scene3Solution";
+import Scene2Positioning from "../scenes/Scene2Positioning";
+import Scene3TwoTruths from "../scenes/Scene3TwoTruths";
 import Scene4CLI from "../scenes/Scene4CLI";
 import Scene5Components from "../scenes/Scene5Components";
-import Scene6Theme from "../scenes/Scene6Theme";
-import Scene7CTA from "../scenes/Scene7CTA";
+import Scene6StyleSheet from "../scenes/Scene6StyleSheet";
+import Scene7SocialProof from "../scenes/Scene7SocialProof";
+import Scene8CTA from "../scenes/Scene8CTA";
 
-export const SCENE_FRAMES = {
-  Scene1: { from: 0, duration: 300 },
-  Scene2: { from: 300, duration: 420 },
-  Scene3: { from: 720, duration: 360 },
-  Scene4: { from: 1080, duration: 600 },
-  Scene5: { from: 1680, duration: 600 },
-  Scene6: { from: 2280, duration: 360 },
-  Scene7: { from: 2640, duration: 480 },
-};
+export const TOTAL_FRAMES = 3300;
 
-export const TOTAL_DURATION = 3120;
+const SCENES = [
+  { Component: Scene1Hook, durationInFrames: 360 },
+  { Component: Scene2Positioning, durationInFrames: 360 },
+  { Component: Scene3TwoTruths, durationInFrames: 360 },
+  { Component: Scene4CLI, durationInFrames: 600 },
+  { Component: Scene5Components, durationInFrames: 360 },
+  { Component: Scene6StyleSheet, durationInFrames: 360 },
+  { Component: Scene7SocialProof, durationInFrames: 360 },
+  { Component: Scene8CTA, durationInFrames: 540 },
+];
 
-const PromoVideo: React.FC = () => {
+export const PromoVideo: React.FC = () => {
+  let from = 0;
+
   return (
-    <AbsoluteFill>
-      <Sequence
-        from={SCENE_FRAMES.Scene1.from}
-        durationInFrames={SCENE_FRAMES.Scene1.duration}
-      >
-        <Scene1Hook />
-      </Sequence>
-      <Sequence
-        from={SCENE_FRAMES.Scene2.from}
-        durationInFrames={SCENE_FRAMES.Scene2.duration}
-      >
-        <Scene2Problem />
-      </Sequence>
-      <Sequence
-        from={SCENE_FRAMES.Scene3.from}
-        durationInFrames={SCENE_FRAMES.Scene3.duration}
-      >
-        <Scene3Solution />
-      </Sequence>
-      <Sequence
-        from={SCENE_FRAMES.Scene4.from}
-        durationInFrames={SCENE_FRAMES.Scene4.duration}
-      >
-        <Scene4CLI />
-      </Sequence>
-      <Sequence
-        from={SCENE_FRAMES.Scene5.from}
-        durationInFrames={SCENE_FRAMES.Scene5.duration}
-        style={{
-          scale: 1.002,
-        }}
-      >
-        <Scene5Components />
-      </Sequence>
-      <Sequence
-        from={SCENE_FRAMES.Scene6.from}
-        durationInFrames={SCENE_FRAMES.Scene6.duration}
-      >
-        <Scene6Theme />
-      </Sequence>
-      <Sequence
-        from={SCENE_FRAMES.Scene7.from}
-        durationInFrames={SCENE_FRAMES.Scene7.duration}
-      >
-        <Scene7CTA />
-      </Sequence>
+    <AbsoluteFill style={{ backgroundColor: "#09090b" }}>
+      {SCENES.map(({ Component, durationInFrames }, i) => {
+        const start = from;
+        from += durationInFrames;
+        return (
+          <Sequence key={i} from={start} durationInFrames={durationInFrames}>
+            <Component />
+          </Sequence>
+        );
+      })}
     </AbsoluteFill>
   );
 };
-
-export default PromoVideo;

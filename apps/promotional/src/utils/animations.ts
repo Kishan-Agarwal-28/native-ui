@@ -1,69 +1,124 @@
-import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { spring, interpolate } from "remotion";
 
-export function useFadeIn(startFrame: number, duration = 20) {
-  const frame = useCurrentFrame();
-  return interpolate(frame, [startFrame, startFrame + duration], [0, 1], {
+export type SpringConfig = {
+  damping: number;
+  stiffness: number;
+  mass?: number;
+};
+
+export const defaultSpring: SpringConfig = {
+  damping: 10,
+  stiffness: 100,
+};
+
+export const slamSpring: SpringConfig = {
+  damping: 8,
+  stiffness: 200,
+};
+
+export const gentleSpring: SpringConfig = {
+  damping: 14,
+  stiffness: 80,
+};
+
+export function clampedSpring(
+  frame: number,
+  config: SpringConfig = defaultSpring,
+  from = 0,
+  to = 1,
+): number {
+  const f = Math.max(0, frame);
+  const s = spring({
+    frame: f,
+    fps: 60,
+    config: {
+      damping: config.damping,
+      stiffness: config.stiffness,
+      mass: config.mass ?? 1,
+    },
+  });
+  return from + (to - from) * s;
+}
+
+export function snapIn(
+  frame: number,
+  startFrame: number,
+  duration: number,
+): number {
+  const f = Math.max(0, frame - startFrame);
+  return f >= duration ? 1 : 0;
+}
+
+export function fadeIn(
+  frame: number,
+  startFrame: number,
+  duration: number,
+): number {
+  const f = Math.max(0, frame - startFrame);
+  return interpolate(f, [0, duration], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 }
 
-export function useSlideUp(startFrame: number, distance = 40) {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const progress = spring({
-    fps,
-    frame: frame - startFrame,
-    config: { damping: 14, stiffness: 120, mass: 0.8 },
-  });
-  return interpolate(progress, [0, 1], [distance, 0]);
-}
-
-export function useScaleIn(startFrame: number) {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const s = spring({
-    fps,
-    frame: frame - startFrame,
-    config: { damping: 12, stiffness: 180, mass: 0.6 },
-    from: 0.85,
-    to: 1,
-  });
-  return s;
-}
-
-export function useStaggered(index: number, startFrame: number, stagger = 8) {
-  return startFrame + index * stagger;
-}
-
-export function useSpringValue(
+export function slideInFromRight(
+  frame: number,
   startFrame: number,
-  configOverride?: {
-    damping?: number;
-    stiffness?: number;
-    mass?: number;
-  },
-) {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  return spring({
-    fps,
-    frame: frame - startFrame,
+  distance: number,
+  config?: SpringConfig,
+): number {
+  const f = Math.max(0, frame - startFrame);
+  const s = spring({
+    frame: f,
+    fps: 60,
     config: {
-      damping: configOverride?.damping ?? 14,
-      stiffness: configOverride?.stiffness ?? 120,
-      mass: configOverride?.mass ?? 0.8,
+      damping: config?.damping ?? defaultSpring.damping,
+      stiffness: config?.stiffness ?? defaultSpring.stiffness,
+      mass: config?.mass ?? 1,
     },
   });
+  return interpolate(s, [0, 1], [distance, 0]);
 }
 
-export function useSlideInLeft(startFrame: number, distance = 60) {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const progress = spring({
-    fps,
-    frame: frame - startFrame,
-    config: { damping: 16, stiffness: 150, mass: 0.7 },
+export function slideInFromLeft(
+  frame: number,
+  startFrame: number,
+  distance: number,
+  config?: SpringConfig,
+): number {
+  return -slideInFromRight(frame, startFrame, distance, config);
+}
+
+export function slideIn(
+  frame: number,
+  startFrame: number,
+  duration: number,
+  fromX: number,
+): number {
+  const f = Math.max(0, frame - startFrame);
+  return interpolate(f, [0, duration], [fromX, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
   });
-  return interpolate(progress, [0, 1], [-distance, 0]);
+}
+
+export function shatterUp(
+  frame: number,
+  startFrame: number,
+  stagger: number,
+  index: number,
+  distance: number,
+): { translateY: number; opacity: number } {
+  const f = Math.max(0, frame - startFrame - index * stagger);
+  const progress = interpolate(f, [0, 20], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return {
+    translateY: -distance * progress,
+    opacity: interpolate(progress, [0, 0.5, 1], [1, 0.5, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    }),
+  };
 }

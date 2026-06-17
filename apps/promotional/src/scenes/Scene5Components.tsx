@@ -1,410 +1,256 @@
 import React from "react";
-import {
-  AbsoluteFill,
-  useCurrentFrame,
-  interpolate,
-  useVideoConfig,
-} from "remotion";
-import { colors } from "../utils/colors";
-import { CodeBlock } from "../components/CodeBlock";
+import { useCurrentFrame, interpolate, spring, AbsoluteFill } from "remotion";
+import { C } from "../utils/colors";
 import { PhoneMockup } from "../components/PhoneMockup";
+import { GlassCard } from "../components/GlassCard";
+import { fadeIn } from "../utils/animations";
 
-const EXAMPLE_DURATION = 170;
-const TRANSITION_DURATION = 18;
-
-const buttonCode = `import { Button } from "@/components/ui/button";
-
-export default function Demo() {
-  return (
-    <View>
-      <Button variant="default" title="Primary" />
-      <Button variant="secondary" title="Secondary" />
-      <Button variant="destructive" title="Delete" />
-      <Button variant="ghost" title="Cancel" />
-    </View>
-  );
-}`;
-
-const inputCode = `import Input from "@/components/ui/input";
-
-export default function Demo() {
-  return (
-    <View>
-      <Input
-        label="Email"
-        placeholder="you@example.com"
-        error="Invalid email address"
-      />
-      <Input
-        label="Password"
-        placeholder="Enter password"
-        secureTextEntry
-      />
-    </View>
-  );
-}`;
-
-const cardCode = `import { Card, CardHeader, CardTitle,
-  CardDescription, CardContent } from "@/components/ui/card";
-import { Avatar, Badge, Button } from "@/components/ui";
-
-export default function Demo() {
-  return (
-    <Card>
-      <CardHeader>
-        <Avatar source={{ uri: avatarUrl }} />
-        <Badge variant="outline">Pro</Badge>
-      </CardHeader>
-      <CardTitle>Sarah Chen</CardTitle>
-      <CardDescription>
-        Senior Engineer at Acme Corp
-      </CardDescription>
-      <CardContent>
-        <Button title="View Profile" />
-      </CardContent>
-    </Card>
-  );
-}`;
-
-const examples = [
-  { code: buttonCode, label: "Button Variants" },
-  { code: inputCode, label: "Input States" },
-  { code: cardCode, label: "Card Compositions" },
+const COMPONENTS = [
+  { name: "Button", color: C.accent, y: 0 },
+  { name: "Card", color: C.cyan, y: 1 },
+  { name: "Input", color: C.green, y: 2 },
+  { name: "Badge", color: C.amber, y: 3 },
 ];
-
-const btnColors = [colors.text, colors.text, colors.text, colors.text];
-
-function ButtonMockup({
-  variant,
-  label,
-  style,
-}: {
-  variant: "default" | "secondary" | "destructive" | "ghost";
-  label: string;
-  style?: React.CSSProperties;
-}) {
-  const bgMap = {
-    default: colors.text,
-    secondary: colors.surface,
-    destructive: colors.red,
-    ghost: "transparent",
-  };
-  const textMap = {
-    default: colors.bg,
-    secondary: colors.text,
-    destructive: colors.bg,
-    ghost: colors.text,
-  };
-  const borderMap = {
-    default: "none",
-    secondary: `1px solid ${colors.border}`,
-    destructive: "none",
-    ghost: `1px solid transparent`,
-  };
-  return (
-    <div
-      style={{
-        backgroundColor: bgMap[variant],
-        borderRadius: 10,
-        padding: "10px 0",
-        alignItems: "center",
-        justifyContent: "center",
-        display: "flex",
-        border: borderMap[variant],
-        ...style,
-      }}
-    >
-      <span
-        style={{
-          fontFamily: "'Inter', system-ui, sans-serif",
-          fontSize: 13,
-          fontWeight: 600,
-          color: textMap[variant],
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
-
-function InputMockup({
-  label,
-  placeholder,
-  error,
-}: {
-  label: string;
-  placeholder?: string;
-  error?: string;
-}) {
-  return (
-    <div style={{ width: "100%" }}>
-      <span
-        style={{
-          fontFamily: "'Inter', system-ui, sans-serif",
-          fontSize: 10,
-          fontWeight: 600,
-          color: colors.textSecondary,
-          textTransform: "uppercase",
-          letterSpacing: 0.5,
-          marginBottom: 4,
-          display: "block",
-        }}
-      >
-        {label}
-      </span>
-      <div
-        style={{
-          border: error
-            ? `1.5px solid ${colors.red}`
-            : `1px solid ${colors.border}`,
-          borderRadius: 8,
-          padding: "10px 12px",
-          backgroundColor: colors.surface,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: 13,
-            color: error ? colors.text : colors.textSecondary,
-          }}
-        >
-          {placeholder || ""}
-        </span>
-      </div>
-      {error ? (
-        <span
-          style={{
-            fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: 10,
-            color: colors.red,
-            marginTop: 4,
-            display: "block",
-          }}
-        >
-          {error}
-        </span>
-      ) : null}
-    </div>
-  );
-}
 
 const Scene5Components: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const f = frame;
 
-  const totalExampleSpan = EXAMPLE_DURATION + TRANSITION_DURATION;
-  const currentExample = Math.min(
-    Math.floor((frame - 10) / totalExampleSpan),
-    examples.length - 1,
-  );
-  const localFrame = (frame - 10) % totalExampleSpan;
-
-  const ex = examples[currentExample];
-  if (!ex) return null;
-
-  const slideOffset = interpolate(
-    localFrame,
-    [EXAMPLE_DURATION, EXAMPLE_DURATION + TRANSITION_DURATION],
-    [0, -30],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-  );
-  const opacity =
-    localFrame < EXAMPLE_DURATION
-      ? interpolate(localFrame, [0, 15], [0, 1], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-        })
-      : interpolate(
-          localFrame,
-          [EXAMPLE_DURATION, EXAMPLE_DURATION + TRANSITION_DURATION],
-          [1, 0],
-          { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-        );
-
-  const pageIndicator = (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        gap: 8,
-        justifyContent: "center",
-        marginTop: 16,
-      }}
-    >
-      {examples.map((_, i) => (
-        <div
-          key={i}
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: "50%",
-            backgroundColor:
-              i === currentExample ? colors.accent : colors.border,
-            transition: "none",
-          }}
-        />
-      ))}
-    </div>
-  );
+  // Phone entrance
+  const phoneSpring = spring({
+    frame: f,
+    fps: 60,
+    config: { damping: 14, stiffness: 100, mass: 1 },
+  });
 
   return (
-    <AbsoluteFill style={{ backgroundColor: colors.bg }}>
+    <AbsoluteFill
+      style={{
+        backgroundColor: C.bg,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: '"Inter", sans-serif',
+        overflow: "hidden",
+      }}
+    >
+      {/* Section label */}
       <div
         style={{
           position: "absolute",
-          top: 40,
-          left: 0,
-          right: 0,
-          textAlign: "center",
+          top: 80,
+          left: "50%",
+          transform: "translateX(-50%)",
+          opacity: fadeIn(f, 0, 20),
+          zIndex: 10,
         }}
       >
         <span
           style={{
-            fontFamily: "'Inter', system-ui, sans-serif",
             fontSize: 14,
             fontWeight: 600,
-            color: colors.accent,
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
+            color: C.accent,
+            letterSpacing: 3,
+            textTransform: "uppercase" as const,
           }}
         >
-          {ex.label}
+          Components
         </span>
       </div>
+
+      {/* Phone mockup */}
       <div
         style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 40,
-          padding: "60px 80px",
-          transform: `translateY(${slideOffset}px)`,
-          opacity,
+          transform: `translateY(${interpolate(
+            phoneSpring,
+            [0, 1],
+            [60, 0],
+          )}px) scale(${0.92 + phoneSpring * 0.08})`,
+          opacity: phoneSpring,
+          zIndex: 10,
         }}
       >
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <CodeBlock code={ex.code} style={{ fontSize: 12, maxHeight: 460 }} />
-        </div>
+        <PhoneMockup width={260} height={520} glowColor={C.accent}>
+          {/* Phone screen content */}
+          <div
+            style={{
+              padding: 20,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+              height: "100%",
+            }}
+          >
+            {/* Mock button */}
+            <div
+              style={{
+                padding: "12px 16px",
+                borderRadius: 10,
+                backgroundColor: C.accent,
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 600,
+                textAlign: "center",
+                opacity: fadeIn(f, 40, 20),
+                transform: `translateY(${interpolate(f, [40, 60], [10, 0], {
+                  extrapolateLeft: "clamp",
+                  extrapolateRight: "clamp",
+                })}px)`,
+              }}
+            >
+              Button
+            </div>
 
-        <div style={{ flexShrink: 0 }}>
-          <PhoneMockup>
-            {currentExample === 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <ButtonMockup variant="default" label="Primary" />
-                <ButtonMockup variant="secondary" label="Secondary" />
-                <ButtonMockup variant="destructive" label="Delete" />
-                <ButtonMockup variant="ghost" label="Cancel" />
-              </div>
-            )}
-            {currentExample === 1 && (
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 16 }}
-              >
-                <InputMockup
-                  label="Email"
-                  placeholder="you@example.com"
-                  error="Invalid email address"
-                />
-                <InputMockup label="Password" placeholder="Enter password" />
-              </div>
-            )}
-            {currentExample === 2 && (
+            {/* Mock card */}
+            <div
+              style={{
+                padding: 14,
+                borderRadius: 12,
+                backgroundColor: C.elevated,
+                border: `1px solid ${C.border}`,
+                opacity: fadeIn(f, 70, 20),
+                transform: `translateY(${interpolate(f, [70, 90], [10, 0], {
+                  extrapolateLeft: "clamp",
+                  extrapolateRight: "clamp",
+                })}px)`,
+              }}
+            >
               <div
                 style={{
-                  backgroundColor: colors.surface,
-                  borderRadius: 14,
-                  border: `1px solid ${colors.border}`,
-                  padding: 16,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
+                  width: 40,
+                  height: 40,
+                  borderRadius: 8,
+                  backgroundColor: C.accent,
+                  marginBottom: 8,
                 }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 20,
-                      backgroundColor: colors.accent,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <span style={{ fontSize: 18 }}>👤</span>
-                  </div>
-                  <div
-                    style={{
-                      backgroundColor: "transparent",
-                      border: `1px solid ${colors.border}`,
-                      borderRadius: 9999,
-                      padding: "4px 10px",
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: "'Inter', system-ui, sans-serif",
-                        fontSize: 10,
-                        color: colors.textSecondary,
-                        fontWeight: 500,
-                      }}
-                    >
-                      Pro
-                    </span>
-                  </div>
-                </div>
+              />
+              <div
+                style={{
+                  height: 10,
+                  width: "70%",
+                  borderRadius: 4,
+                  backgroundColor: C.border,
+                  marginBottom: 6,
+                }}
+              />
+              <div
+                style={{
+                  height: 8,
+                  width: "50%",
+                  borderRadius: 4,
+                  backgroundColor: C.border,
+                }}
+              />
+            </div>
+
+            {/* Mock input */}
+            <div
+              style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                backgroundColor: C.elevated,
+                border: `1px solid ${C.border}`,
+                color: C.muted,
+                fontSize: 13,
+                opacity: fadeIn(f, 100, 20),
+                transform: `translateY(${interpolate(f, [100, 120], [10, 0], {
+                  extrapolateLeft: "clamp",
+                  extrapolateRight: "clamp",
+                })}px)`,
+              }}
+            >
+              Input
+            </div>
+
+            {/* Mock badge */}
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                marginTop: 4,
+                opacity: fadeIn(f, 130, 20),
+              }}
+            >
+              {["New", "Beta"].map((badge, i) => (
                 <span
+                  key={badge}
                   style={{
-                    fontFamily: "'Inter', system-ui, sans-serif",
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: colors.text,
-                  }}
-                >
-                  Sarah Chen
-                </span>
-                <span
-                  style={{
-                    fontFamily: "'Inter', system-ui, sans-serif",
+                    padding: "4px 10px",
+                    borderRadius: 12,
+                    backgroundColor:
+                      i === 0
+                        ? "rgba(74,222,128,0.12)"
+                        : "rgba(251,191,36,0.12)",
+                    color: i === 0 ? C.green : C.amber,
                     fontSize: 11,
-                    color: colors.textSecondary,
+                    fontWeight: 600,
                   }}
                 >
-                  Senior Engineer at Acme Corp
+                  {badge}
                 </span>
-                <ButtonMockup
-                  variant="default"
-                  label="View Profile"
-                  style={{ marginTop: 4 }}
-                />
-              </div>
-            )}
-          </PhoneMockup>
-        </div>
+              ))}
+            </div>
+          </div>
+        </PhoneMockup>
       </div>
 
+      {/* Component labels floating around */}
+      {COMPONENTS.map((comp, i) => {
+        const side = i % 2 === 0 ? -1 : 1;
+        const labelSpring = spring({
+          frame: f - (160 + i * 20),
+          fps: 60,
+          config: { damping: 10, stiffness: 150, mass: 1 },
+        });
+
+        return (
+          <div
+            key={comp.name}
+            style={{
+              position: "absolute",
+              top: `${30 + comp.y * 12}%`,
+              [side === -1 ? "left" : "right"]: 100,
+              transform: `translateX(${interpolate(
+                labelSpring,
+                [0, 1],
+                [side * 40, 0],
+              )}px)`,
+              opacity: labelSpring,
+              zIndex: 10,
+            }}
+          >
+            <GlassCard
+              glowColor={comp.color}
+              borderRadius={10}
+              style={{ padding: "10px 18px" }}
+            >
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: comp.color,
+                }}
+              >
+                {comp.name}
+              </span>
+            </GlassCard>
+          </div>
+        );
+      })}
+
+      {/* Component count */}
       <div
         style={{
           position: "absolute",
-          bottom: 32,
-          left: 0,
-          right: 0,
-          opacity,
+          bottom: 60,
+          left: "50%",
+          transform: "translateX(-50%)",
+          opacity: fadeIn(f, 260, 25),
         }}
       >
-        {pageIndicator}
+        <span style={{ fontSize: 15, color: C.muted }}>
+          20+ production-ready components
+        </span>
       </div>
     </AbsoluteFill>
   );

@@ -1,171 +1,60 @@
 import React from "react";
-import { colors } from "../utils/colors";
+import { C } from "../utils/colors";
 
 interface PhoneMockupProps {
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-  screenColor?: string;
+  width?: number;
+  height?: number;
+  children: React.ReactNode;
+  glowColor?: string;
 }
 
 export const PhoneMockup: React.FC<PhoneMockupProps> = ({
+  width = 280,
+  height = 560,
   children,
-  style,
-  screenColor = colors.bg,
+  glowColor = C.accent,
 }) => {
   return (
     <div
       style={{
-        borderRadius: 44,
-        border: "8px solid #2a2a2a",
-        backgroundColor: "#1a1a1a",
-        padding: 0,
-        overflow: "hidden",
-        width: 280,
-        height: 580,
         position: "relative",
-        flexShrink: 0,
-        ...style,
+        width,
+        height,
+        borderRadius: 40,
+        backgroundColor: C.bg,
+        border: `2px solid ${C.border}`,
+        padding: 8,
+        boxShadow: `0 0 60px ${glowColor}20, 0 20px 60px rgba(0,0,0,0.5)`,
+        overflow: "hidden",
       }}
     >
+      {/* Dynamic Island */}
+      <div
+        style={{
+          position: "absolute",
+          top: 16,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: 80,
+          height: 24,
+          borderRadius: 12,
+          backgroundColor: "#000",
+          zIndex: 10,
+        }}
+      />
+      {/* Screen */}
       <div
         style={{
           width: "100%",
           height: "100%",
-          backgroundColor: screenColor,
+          borderRadius: 32,
+          backgroundColor: C.surface,
           overflow: "hidden",
           position: "relative",
-          display: "flex",
-          flexDirection: "column",
         }}
       >
-        <StatusBar />
-        <DynamicIsland />
-        <div
-          style={{
-            flex: 1,
-            padding: "20px 16px",
-            paddingTop: 16,
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
-          }}
-        >
-          {children}
-        </div>
+        {children}
       </div>
     </div>
-  );
-};
-
-const statusBarStyle: React.CSSProperties = {
-  height: 44,
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  padding: "0 24px",
-  paddingTop: 4,
-  zIndex: 10,
-};
-
-const timeStyle: React.CSSProperties = {
-  color: colors.text,
-  fontSize: 14,
-  fontWeight: "600",
-  fontFamily: "system-ui, -apple-system, sans-serif",
-};
-
-const StatusBar: React.FC = () => {
-  return (
-    <div style={statusBarStyle}>
-      <span style={timeStyle}>9:41</span>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 6,
-        }}
-      >
-        <SignalBars />
-        <WifiIcon />
-        <BatteryIcon />
-      </div>
-    </div>
-  );
-};
-
-const DynamicIsland: React.FC = () => {
-  return (
-    <div
-      style={{
-        width: 120,
-        height: 34,
-        borderRadius: 20,
-        backgroundColor: "#000",
-        position: "absolute",
-        top: 12,
-        left: "50%",
-        marginLeft: -60,
-        zIndex: 20,
-      }}
-    />
-  );
-};
-
-const SignalBars: React.FC = () => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "flex-end",
-        gap: 1.5,
-      }}
-    >
-      {[3, 5, 7, 9].map((h, i) => (
-        <div
-          key={i}
-          style={{
-            width: 3,
-            height: h,
-            backgroundColor: colors.text,
-            borderRadius: 1,
-          }}
-        />
-      ))}
-    </div>
-  );
-};
-
-const WifiIcon: React.FC = () => {
-  return (
-    <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-      <path
-        d="M7 9.5a1 1 0 110-2 1 1 0 010 2zM4.5 7a3.5 3.5 0 015 0M2.5 4.5a6.5 6.5 0 019 0M0.5 2a9.5 9.5 0 0113 0"
-        stroke={colors.text}
-        strokeWidth="1.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-};
-
-const BatteryIcon: React.FC = () => {
-  return (
-    <svg width="22" height="11" viewBox="0 0 22 11" fill="none">
-      <rect
-        x="0.5"
-        y="0.5"
-        width="18"
-        height="10"
-        rx="2"
-        stroke={colors.text}
-        strokeWidth="1"
-      />
-      <rect x="2.5" y="2" width="14" height="7" rx="1" fill={colors.green} />
-      <rect x="19.5" y="3.5" width="2" height="4" rx="0.5" fill={colors.text} />
-    </svg>
   );
 };

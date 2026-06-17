@@ -1,176 +1,337 @@
 import React from "react";
 import {
-  AbsoluteFill,
   useCurrentFrame,
+  useVideoConfig,
   interpolate,
   spring,
-  useVideoConfig,
+  AbsoluteFill,
 } from "remotion";
+import { C } from "../utils/colors";
 import { Terminal } from "../components/Terminal";
-import { colors } from "../utils/colors";
+import { TypedText } from "../components/TypedText";
+import { CRTText } from "../components/CRTText";
+import { Glow } from "../components/Glow";
+import { xorshift32 } from "../utils/seed";
 
-const LINE_HEIGHT = 24;
-const INIT_DELAY = 20;
-const CHAR_RATE = 3;
-const PAUSE_AFTER_LINE = 12;
-
-interface ScriptLine {
-  text: string;
-  type: "prompt" | "typing" | "success" | "dim";
-}
-
-const script: ScriptLine[] = [
-  { text: "$ nativeui-cli init", type: "prompt" },
-  { text: "✔ TypeScript? … yes", type: "success" },
-  { text: "✔ Output dir … components/ui", type: "success" },
-  { text: "✔ Install deps? … yes", type: "success" },
-  { text: "$ nativeui-cli add button card input", type: "prompt" },
-  { text: "✓ button     installed", type: "success" },
-  { text: "✓ card       installed", type: "success" },
-  { text: "✓ input      installed", type: "success" },
+const FILE_PATHS = [
+  "src/components/Button.tsx",
+  "src/components/Card.tsx",
+  "src/components/Input.tsx",
+  "src/styles/native-ui.css",
+  "src/hooks/useTheme.ts",
+  "src/utils/colors.ts",
+  "package.json",
+  "tsconfig.json",
+  "src/app/layout.tsx",
+  "src/app/page.tsx",
+  "public/favicon.ico",
+  "next.config.js",
+  "src/components/Badge.tsx",
+  "src/components/Avatar.tsx",
+  "src/components/Switch.tsx",
+  "src/components/Select.tsx",
+  "src/lib/utils.ts",
+  "src/types/index.ts",
+  "README.md",
+  ".gitignore",
 ];
 
-function getCharCount(text: string): number {
-  return text.length;
+interface DriftPath {
+  text: string;
+  x: number;
+  startY: number;
+  speed: number;
+  opacity: number;
+  size: number;
 }
 
-function computeTimings(charsPerFrame: number): number[] {
-  const lineStarts: number[] = [];
-  let currentFrame = INIT_DELAY;
-  for (const line of script) {
-    lineStarts.push(currentFrame);
-    const chars = getCharCount(line.text);
-    const typingFrames = Math.ceil(chars / charsPerFrame);
-    currentFrame += typingFrames + PAUSE_AFTER_LINE;
+function createDriftPaths(
+  seed: number,
+  width: number,
+  height: number,
+): DriftPath[] {
+  const rand = xorshift32(seed);
+  const count = 40;
+  const paths: DriftPath[] = [];
+  for (let i = 0; i < count; i++) {
+    const text = FILE_PATHS[Math.floor(rand() * FILE_PATHS.length)];
+    paths.push({
+      text,
+      x: rand() * width,
+      startY: rand() * height + height,
+      speed: 0.3 + rand() * 0.5,
+      opacity: 0.03 + rand() * 0.04,
+      size: 11 + rand() * 4,
+    });
   }
-  return lineStarts;
+  return paths;
 }
+
+const DriftingPaths: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { width, height } = useVideoConfig();
+  const paths = React.useMemo(
+    () => createDriftPaths(12345, width, height),
+    [width, height],
+  );
+
+  return (
+    <AbsoluteFill style={{ overflow: "hidden", zIndex: 0 }}>
+      {paths.map((p, i) => {
+        const y = (p.startY - frame * p.speed) % (height * 2);
+        const displayY = y > height ? y - height * 2 : y;
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: p.x,
+              top: displayY,
+              fontSize: p.size,
+              color: C.text,
+              opacity: p.opacity,
+              fontFamily: '"JetBrains Mono", monospace',
+              whiteSpace: "nowrap",
+              pointerEvents: "none",
+            }}
+          >
+            {p.text}
+          </div>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
+const ProgressBar: React.FC<{
+  progress: number;
+  color?: string;
+}> = ({ progress, color = C.accent }) => {
+  const clamped = Math.max(0, Math.min(1, progress));
+  return (
+    <div
+      style={{
+        width: 200,
+        height: 4,
+        backgroundColor: "rgba(255,255,255,0.05)",
+        borderRadius: 2,
+        overflow: "hidden",
+        marginTop: 4,
+      }}
+    >
+      <div
+        style={{
+          width: `${clamped * 100}%`,
+          height: "100%",
+          backgroundColor: color,
+          borderRadius: 2,
+          transition: "none",
+        }}
+      />
+    </div>
+  );
+};
 
 const Scene4CLI: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { width, height } = useVideoConfig();
+  const f = frame;
 
-  const slideProgress = spring({
-    fps,
-    frame: Math.max(0, frame - 5),
-    config: { damping: 16, stiffness: 140, mass: 0.8 },
+  // Terminal entrance
+  const terminalScale = spring({
+    frame: f,
+    fps: 60,
+    config: { damping: 15, stiffness: 100, mass: 1 },
   });
-  const translateY = interpolate(slideProgress, [0, 1], [120, 0]);
 
-  const fadeIn = interpolate(frame, [0, 15], [0, 1], {
+  // Content fade in after terminal appears
+  const contentOpacity = interpolate(f, [30, 50], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  const lineStarts = computeTimings(CHAR_RATE);
+  // Scan line sweep
+  const scanLineProgress = (f % 180) / 180;
+  const scanLineY = scanLineProgress * 440;
 
-  function renderLine(line: ScriptLine, lineIndex: number): React.ReactNode {
-    const ls = lineStarts[lineIndex];
-    if (frame < ls) return null;
+  // Install progress
+  const installProgress = interpolate(f, [120, 200], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
-    const txt = line.text;
-    const chars = txt.length;
-    const typingEnd = ls + Math.ceil(chars / CHAR_RATE);
-    const progress = Math.min(chars, Math.floor((frame - ls) * CHAR_RATE));
-    const visibleText = line.type === "success" ? txt : txt.slice(0, progress);
+  const addProgress = interpolate(f, [220, 350], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
-    const isTyping = line.type === "prompt" && frame < typingEnd;
-    const cursorBlink = isTyping && frame % 12 < 6;
-
-    let color = colors.textSecondary;
-    if (line.type === "prompt") color = colors.text;
-    if (line.type === "success") color = colors.green;
-    if (line.type === "dim") color = colors.textSecondary;
-
-    const lineStyle: React.CSSProperties = {
-      fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-      fontSize: 15,
-      lineHeight: `${LINE_HEIGHT}px`,
-      color,
-      whiteSpace: "pre",
-      overflow: "hidden",
-    };
-
-    if (line.type === "prompt") {
-      const promptChar = "\x1b[95m$\x1b[0m ";
-      return (
-        <div key={lineIndex} style={lineStyle}>
-          <span style={{ color: colors.accent }}>$ </span>
-          <span>{visibleText.slice(2)}</span>
-          {cursorBlink ? (
-            <span
-              style={{
-                display: "inline-block",
-                width: 2,
-                height: 16,
-                backgroundColor: colors.accent,
-                marginLeft: 1,
-                verticalAlign: "middle",
-              }}
-            />
-          ) : null}
-        </div>
-      );
-    }
-
-    const lineFadeIn = interpolate(frame, [ls, ls + 6], [0, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    });
-
-    if (line.type === "success") {
-      const flashElapsed = frame - ls;
-      const flashIntensity = Math.max(0, 1 - flashElapsed / 20);
-      const flashColor =
-        flashIntensity > 0
-          ? `rgba(74, 222, 128, ${0.15 * flashIntensity})`
-          : "transparent";
-
-      return (
-        <div
-          key={lineIndex}
-          style={{
-            ...lineStyle,
-            opacity: lineFadeIn,
-            backgroundColor: flashColor,
-            borderRadius: 4,
-            padding: "0 4px",
-            margin: "0 -4px",
-          }}
-        >
-          {visibleText}
-        </div>
-      );
-    }
-
-    return (
-      <div key={lineIndex} style={{ ...lineStyle, opacity: lineFadeIn }}>
-        {visibleText}
-      </div>
-    );
-  }
+  const iconAddScale = spring({
+    frame: f - 360,
+    fps: 60,
+    config: { damping: 10, stiffness: 200, mass: 1 },
+  });
 
   return (
-    <AbsoluteFill style={{ backgroundColor: colors.bg, padding: "60px 80px" }}>
+    <AbsoluteFill
+      style={{
+        backgroundColor: C.bg,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: '"Inter", sans-serif',
+      }}
+    >
+      {/* Background drifting paths */}
+      <DriftingPaths />
+
+      {/* Ambient glow behind terminal */}
+      <Glow
+        x={width / 2}
+        y={height / 2}
+        color={C.accent}
+        radius={350}
+        opacity={0.12}
+        animated
+      />
+
+      {/* Terminal container */}
       <div
         style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          opacity: fadeIn,
+          transform: `scale(${0.85 + terminalScale * 0.15})`,
+          opacity: terminalScale,
+          zIndex: 10,
         }}
       >
-        <div
-          style={{
-            width: "100%",
-            maxWidth: 820,
-            transform: `translateY(${translateY}px)`,
-          }}
-        >
-          <Terminal>{script.map((line, i) => renderLine(line, i))}</Terminal>
-        </div>
+        <Terminal width={860} height={480} scanLine={false}>
+          <div style={{ opacity: contentOpacity }}>
+            {/* Command 1: init */}
+            <div style={{ marginBottom: 16 }}>
+              <TypedText
+                lines={[
+                  {
+                    text: "$ npx nativeui-cli init",
+                    color: "#fafafa",
+                    delay: 0,
+                  },
+                  {
+                    text: "✓ Creating project structure...",
+                    color: "#a78bfa",
+                    delay: 30,
+                  },
+                  {
+                    text: "✓ Installing dependencies...",
+                    color: "#a78bfa",
+                    delay: 60,
+                  },
+                  { text: "✓ Ready in 1.2s", color: "#4ade80", delay: 90 },
+                ]}
+                startFrame={40}
+                speed={2.5}
+                fontSize={15}
+              />
+              <div style={{ marginTop: 4 }}>
+                <ProgressBar progress={installProgress} />
+              </div>
+            </div>
+
+            {/* Command 2: add components */}
+            <div style={{ marginBottom: 16 }}>
+              <TypedText
+                lines={[
+                  {
+                    text: "$ npx nativeui-cli add button card input",
+                    color: "#fafafa",
+                    delay: 0,
+                  },
+                  { text: "✓ Button", color: "#4ade80", delay: 30 },
+                  { text: "✓ Card", color: "#4ade80", delay: 45 },
+                  { text: "✓ Input", color: "#4ade80", delay: 60 },
+                  {
+                    text: "3 components installed",
+                    color: "#6ee7b7",
+                    delay: 80,
+                  },
+                ]}
+                startFrame={210}
+                speed={2.5}
+                fontSize={15}
+              />
+              <div style={{ marginTop: 4 }}>
+                <ProgressBar progress={addProgress} />
+              </div>
+            </div>
+
+            {/* Success banner */}
+            <div
+              style={{
+                marginTop: 24,
+                padding: "12px 16px",
+                backgroundColor: "rgba(74, 222, 128, 0.08)",
+                border: "1px solid rgba(74, 222, 128, 0.2)",
+                borderRadius: 8,
+                opacity: interpolate(f, [360, 380], [0, 1], {
+                  extrapolateLeft: "clamp",
+                  extrapolateRight: "clamp",
+                }),
+                transform: `scale(${iconAddScale})`,
+                transformOrigin: "left center",
+              }}
+            >
+              <div
+                style={{
+                  color: "#4ade80",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <span style={{ fontSize: 16 }}>✓</span>
+                <span>Your components are ready to use</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Scan line inside terminal */}
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: scanLineY,
+              height: 2,
+              background: `linear-gradient(90deg, transparent, ${C.accent}60, transparent)`,
+              pointerEvents: "none",
+              opacity: 0.6,
+            }}
+          />
+        </Terminal>
+      </div>
+
+      {/* Title label */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 60,
+          left: "50%",
+          transform: "translateX(-50%)",
+          opacity: interpolate(f, [380, 400], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          }),
+        }}
+      >
+        <CRTText
+          text="NATIVEUI CLI"
+          startFrame={390}
+          charsPerFrame={1.5}
+          color={C.accent}
+          size={14}
+          weight={600}
+          ghost={false}
+          style={{ letterSpacing: 4, textAlign: "center" }}
+        />
       </div>
     </AbsoluteFill>
   );

@@ -6,7 +6,8 @@
     "dev": "remotion studio",
     "build": "remotion render PromoVideo out/promo.mp4",
     "still": "remotion still PromoVideo out/still.png",
-    "preview": "remotion preview"
+    "preview": "remotion preview",
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "react": "^19.0.0",

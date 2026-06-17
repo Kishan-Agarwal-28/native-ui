@@ -1,24 +1,34 @@
 import React from "react";
-import { colors } from "../utils/colors";
+import { C } from "../utils/colors";
 
 interface GlassCardProps {
+  width?: number;
+  height?: number;
   children: React.ReactNode;
+  glowColor?: string;
+  borderRadius?: number;
   style?: React.CSSProperties;
 }
 
-export const GlassCard: React.FC<GlassCardProps> = ({ children, style }) => {
+export const GlassCard: React.FC<GlassCardProps> = ({
+  width,
+  height,
+  children,
+  glowColor = C.accent,
+  borderRadius = 16,
+  style,
+}) => {
   return (
     <div
       style={{
-        background: "rgba(255,255,255,0.05)",
-        border: "1px solid rgba(255,255,255,0.1)",
-        borderRadius: 12,
-        backdropFilter: "blur(8px)",
-        padding: "24px 28px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 8,
+        position: "relative",
+        width,
+        height,
+        borderRadius,
+        backgroundColor: "rgba(255, 255, 255, 0.04)",
+        border: "1px solid rgba(255, 255, 255, 0.08)",
+        boxShadow: `0 0 40px ${glowColor}15, inset 0 1px 0 rgba(255,255,255,0.05)`,
+        overflow: "hidden",
         ...style,
       }}
     >
