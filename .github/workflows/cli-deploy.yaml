@@ -37,9 +37,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 11.3.0
-          run_install: false
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -52,4 +49,4 @@ jobs:
 
       - name: Publish to npm
         working-directory: ./apps/cli
-        run: pnpm stage publish --provenance --no-git-checks
+        run: npm stage publish --provenance --no-git-checks
