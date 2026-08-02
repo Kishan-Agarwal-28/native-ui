@@ -40,7 +40,7 @@ jobs:
         uses: rharkor/caching-for-turbo@v2.3.13
 
       - name: Build workspace dependencies
-        run: pnpm turbo run build --filter=@repo/components^...
+        run: pnpm turbo run build --filter=ui-dev^...
 
       - name: Generate Registries & Bulk JSON
 
