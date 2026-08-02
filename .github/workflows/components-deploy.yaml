@@ -51,5 +51,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: npm
           # The Wrangler CLI command to upload the bulk file
           command: kv:bulk put bulk-upload.json --namespace-id ${{ secrets.KV_NAMESPACE_ID }}
