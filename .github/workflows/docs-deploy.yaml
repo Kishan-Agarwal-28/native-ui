@@ -1,6 +1,7 @@
 name: Deploy native-ui docs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - prod/docs
