@@ -1,6 +1,7 @@
 name: Deploy native-ui showcase
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - prod/showcase
