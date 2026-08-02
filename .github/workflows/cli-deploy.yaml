@@ -14,6 +14,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    environment: npm-publish
     permissions:
       id-token: write 
       contents: read
