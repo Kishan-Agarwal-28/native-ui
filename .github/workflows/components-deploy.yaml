@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - prod/components
+      - prod/all
     paths:
       - 'apps/ui-dev/src/components/ui/**'
   
