@@ -1,0 +1,42 @@
+---
+title: Refresh Control
+description: A component for implementing pull-to-refresh functionality.
+---
+
+import { CommandTabs } from "@//components/command-tabs";
+import { ExternalLinks } from "@//components/external-links";
+import { PreviewCard } from "@//components/preview-card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@//components/ui/tabs";
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<div className="h-5"/>
+
+## Installation
+
+<Tabs defaultValue="cli">
+  <TabsList>
+    <TabsTrigger value="cli">CLI</TabsTrigger>
+    <TabsTrigger value="manual">Manual</TabsTrigger>
+  </TabsList>
+  <TabsContent value="cli">
+    <Steps>
+      <Step>
+        <CommandTabs args={["add", "refresh-control"]} />
+      </Step>
+    </Steps>
+  </TabsContent>
+  <TabsContent value="manual">
+    <Steps>
+      <Step>
+        **Copy and paste the following code into `components/ui/refresh-control.tsx`:**
+        <ComponentSource name="refresh-control" />
+      </Step>
+    </Steps>
+  </TabsContent>
+</Tabs>
+
+## Usage
+
+```tsx
+import RefreshControl from '@/components/ui/refresh-control';
+```

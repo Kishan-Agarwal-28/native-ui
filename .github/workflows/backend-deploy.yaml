@@ -6,6 +6,10 @@ on:
       - prod/backend
       - prod/all
 
+concurrency:
+  group: backend-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -27,6 +31,18 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Spins up a local Turborepo Remote Cache server backed by GitHub Actions
+      # cache storage. Auto-sets TURBO_API, TURBO_TOKEN, TURBO_TEAM — no Vercel
+      # account or secrets needed.
+      - name: Setup Turborepo GitHub cache
+        uses: rharkor/caching-for-turbo@v2.3.13
+
+      # Build any internal workspace packages the backend depends on.
+      # ^... means "only deps of @repo/backend, not the package itself" —
+      # wrangler handles the final Worker bundle in the next step.
+      - name: Build workspace dependencies
+        run: pnpm turbo run build --filter=@repo/backend^...
 
       - name: Build & Deploy Worker
         uses: cloudflare/wrangler-action@v3

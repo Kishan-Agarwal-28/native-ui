@@ -1,0 +1,110 @@
+name: "🧩 New Component Request"
+description: Request a specific UI component be added to the registry.
+title: "component: "
+labels: ["new-component", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Components in NativeUI are copy-paste source files — not packages.  
+        The bar for inclusion is: **could this be useful across many apps, 
+        and can it be implemented with pure StyleSheet (no external deps)?**
+
+  - type: input
+    id: name
+    attributes:
+      label: Component name
+      placeholder: "e.g. BottomSheet, ColorPicker, OTPInput"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What does it do?
+      description: One clear paragraph. If you can't describe it simply, it might be too complex.
+      placeholder: "A bottom sheet that slides up from the bottom of the screen with a drag handle, backdrop overlay, and snap points. Used for contextual menus and action sheets."
+    validations:
+      required: true
+
+  - type: textarea
+    id: api
+    attributes:
+      label: Desired API / usage
+      render: tsx
+      placeholder: |
+        <BottomSheet
+          open={isOpen}
+          onClose={() => setOpen(false)}
+          snapPoints={['40%', '80%']}
+        >
+          <Text>Content here</Text>
+        </BottomSheet>
+    validations:
+      required: false
+
+  - type: input
+    id: shadcn-ref
+    attributes:
+      label: shadcn/ui or Radix equivalent
+      placeholder: "e.g. https://ui.shadcn.com/docs/components/drawer"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: deps
+    attributes:
+      label: Can this be built with StyleSheet only — no new npm deps?
+      description: >
+        NativeUI's core promise is zero external styling deps. 
+        react-native-reanimated and react-native-gesture-handler 
+        are acceptable since they're Expo defaults.
+      options:
+        - "Yes — pure StyleSheet + RN core APIs"
+        - "Yes — needs react-native-reanimated (already a base dep)"
+        - "Yes — needs react-native-gesture-handler (already a base dep)"  
+        - "No — requires a new npm package"
+    validations:
+      required: true
+
+  - type: textarea
+    id: new-deps
+    attributes:
+      label: If new deps are needed, which ones and why?
+      placeholder: "@gorhom/bottom-sheet — because gesture + animation complexity is too high to build from scratch reliably"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated complexity
+      options:
+        - "Simple — stateless or minimal state (like Badge, Separator)"
+        - "Medium — controlled state, variants (like Input, Select)"
+        - "Complex — animations, gestures, portals (like BottomSheet, DatePicker)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: pr
+    attributes:
+      label: Will you contribute the implementation?
+      options:
+        - "Yes — I'll build it and open a PR"
+        - "Yes — I have a working version I can adapt"
+        - "No — requesting someone else builds it"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: This component does not already exist in the registry
+          required: true
+        - label: This is a general-purpose component, not specific to my app's domain
+          required: true
+        - label: I've checked that no existing component can be composed to achieve the same result
+          required: true

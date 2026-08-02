@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "separator",
+  "type": "registry:component",
+  "title": "Separator",
+  "description": "Separator component",
+  "registryDependencies": [],
+  "dependencies": [],
+  "category": "layout",
+  "files": [
+    {
+      "path": "components/ui/separator.tsx",
+      "type": "registry:component",
+      "target": "components/ui/separator.tsx",
+      "content": "import { THEME } from \"@/lib/theme\";\nimport useStyles from \"@/lib/use-styles\";\nimport { forwardRef } from \"react\";\nimport { StyleProp, Text, View, ViewStyle, type ViewProps } from \"react-native\";\ntype SeparatorProps = {\n    thickness?: number;\n    spacing?: number;\n    style?: StyleProp<ViewStyle>;\n} & ({\n    orientation?: \"horizontal\";\n    label?: string;\n} | {\n    orientation: \"vertical\";\n    label?: never;\n}) & Omit<ViewProps, \"style\">;\nconst Separator = forwardRef<View, SeparatorProps>(({ orientation = \"horizontal\", label, thickness = 1, spacing: spacingProp = 16, style, accessibilityRole: _accessibilityRole, importantForAccessibility: _ifa, accessibilityElementsHidden: _aeh, ...rest }, ref) => {\n    const styles = useStyles((t) => ({\n        horizontalContainer: {\n            flexDirection: \"row\" as const,\n            alignItems: \"center\" as const,\n            width: \"100%\" as const,\n        },\n        verticalContainer: {\n            flexDirection: \"column\" as const,\n            alignItems: \"center\" as const,\n            alignSelf: \"stretch\" as const,\n        },\n        line: {\n            flex: 1,\n            backgroundColor: THEME[t].colors.border,\n        },\n        labelWrapper: {\n            paddingHorizontal: spacingProp,\n        },\n        labelText: {\n            fontSize: 12,\n            fontWeight: \"500\" as const,\n            color: THEME[t].colors.mutedForeground,\n        },\n    }));\n    const isDecorative = !label;\n    const a11yProps = isDecorative\n        ? ({\n            accessibilityRole: \"none\" as const,\n            importantForAccessibility: \"no-hide-descendants\" as const,\n            accessibilityElementsHidden: true,\n        } as const)\n        : ({\n            role: \"separator\" as const,\n            accessibilityLabel: label,\n        } as const);\n    if (orientation === \"vertical\") {\n        return (<View ref={ref} {...a11yProps} {...rest} style={[\n                styles.verticalContainer,\n                { marginHorizontal: spacingProp },\n                style,\n            ]}>\n          <View style={[styles.line, { width: thickness }]}/>\n        </View>);\n    }\n    return (<View ref={ref} {...a11yProps} {...rest} style={[\n            styles.horizontalContainer,\n            { marginVertical: spacingProp },\n            style,\n        ]}>\n        <View style={[styles.line, { height: thickness }]}/>\n        {label && (<>\n            <View style={styles.labelWrapper}>\n              <Text style={styles.labelText}>{label}</Text>\n            </View>\n            <View style={[styles.line, { height: thickness }]}/>\n          </>)}\n      </View>);\n});\nSeparator.displayName = \"Separator\";\nexport default Separator;"
+    }
+  ]
+}

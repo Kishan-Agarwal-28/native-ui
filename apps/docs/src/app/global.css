@@ -82,7 +82,7 @@ html > body[data-scroll-locked] {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
-    --bg-nd:#0b0d12
+    --bg-nd:#09090b
   }
 
   @theme inline {

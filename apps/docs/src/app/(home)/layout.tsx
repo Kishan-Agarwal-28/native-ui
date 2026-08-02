@@ -1,11 +1,12 @@
-"use client"
-import Link from 'next/link';
-import { HomeLayout } from 'fumadocs-ui/layouts/home';
-import type { HTMLAttributes } from 'react';
-import { ModeToggle } from '@/components/ui/theme-toggle';
-import { cn } from '@/lib/utils';
-import { baseOptions } from '@/lib/layout.shared';
-import { Logo } from '@/components/logo';
+"use client";
+
+import Link from "next/link";
+import { HomeLayout } from "fumadocs-ui/layouts/home";
+import type { HTMLAttributes } from "react";
+import { ModeToggle } from "@/components/ui/theme-toggle";
+import { cn } from "@/lib/utils";
+import { baseOptions } from "@/lib/layout.shared";
+import { Logo } from "@/components/logo";
 
 type ContainerProps = HTMLAttributes<HTMLDivElement>;
 
@@ -14,8 +15,8 @@ function MarketingContainer({ className, ...props }: ContainerProps) {
     <div
       {...props}
       className={cn(
-        'relative flex min-h-screen flex-1 flex-col overflow-hidden bg-white text-slate-900 dark:bg-[#0b0d12] dark:text-white',
-        className
+        "relative flex min-h-screen flex-1 flex-col overflow-hidden bg-white text-zinc-900 dark:bg-[#09090b] dark:text-zinc-100",
+        className,
       )}
     />
   );
@@ -23,38 +24,62 @@ function MarketingContainer({ className, ...props }: ContainerProps) {
 
 function MarketingHeader() {
   return (
-    <header className="relative z-10 flex items-center justify-between px-6 py-6 md:px-12">
-      <Link href="/">
-      <div className="flex items-center gap-3">
-      <Logo />
-    
-        <div className="leading-tight">
-          <p className="text-xs uppercase tracking-[0.32em] text-slate-500 dark:text-white/60">Native UI</p>
-          <p className="text-lg font-semibold text-slate-900 dark:text-white">React Native, refined</p>
-        </div>
-      </div>
+    <header className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 md:px-10 border-b border-zinc-100 dark:border-white/[0.06] bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-xl">
+      <Link href="/" className="flex items-center gap-2.5">
+        <Logo />
+        <span className="text-[15px] font-semibold tracking-tight">
+          Native UI
+        </span>
       </Link>
-      <nav className="hidden items-center gap-6 text-sm text-slate-600 dark:text-white/70 md:flex">
-        <Link href="/docs" className="transition hover:text-slate-900 dark:hover:text-white">
-          Docs
-        </Link>
-        <Link href="/docs/components" className="transition hover:text-slate-900 dark:hover:text-white">
-          Components
-        </Link>
-        <Link href="/docs/installation" className="transition hover:text-slate-900 dark:hover:text-white">
-          Install
-        </Link>
-      </nav>
-      <div className="flex items-center gap-3">
-        <ModeToggle />
+
+      <nav className="hidden md:flex items-center gap-6">
         <Link
           href="/docs"
-          className="hidden rounded-full border border-slate-200 px-4 py-2 text-sm text-slate-600 transition hover:border-slate-400 hover:text-slate-900 dark:border-white/20 dark:text-white/80 dark:hover:border-white/50 dark:hover:text-white md:inline-flex">
-          View docs
+          className="text-[13px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
+        >
+          Docs
+        </Link>
+        <Link
+          href="/docs/components/accordion"
+          className="text-[13px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
+        >
+          Components
         </Link>
         <Link
           href="/docs/installation"
-          className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_30px_rgba(15,23,42,0.2)] transition hover:-translate-y-0.5 dark:bg-white dark:text-[#0b0d12] dark:shadow-[0_8px_30px_rgba(255,255,255,0.2)]">
+          className="text-[13px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
+        >
+          Install
+        </Link>
+      </nav>
+
+      <div className="flex items-center gap-3">
+        <ModeToggle />
+        <a
+          href="https://github.com/Kishan-Agarwal-28/native-ui"
+          target="_blank"
+          rel="noreferrer"
+          className="p-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
+          aria-label="GitHub Repository"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+            <path d="M9 18c-4.51 2-5-2-7-2" />
+          </svg>
+        </a>
+        <Link
+          href="/docs/installation"
+          className="rounded-lg bg-zinc-900 dark:bg-white px-4 py-2 text-[13px] font-medium text-white dark:text-zinc-900 transition-all hover:bg-zinc-800 dark:hover:bg-zinc-200"
+        >
           Get started
         </Link>
       </div>
@@ -62,12 +87,13 @@ function MarketingHeader() {
   );
 }
 
-export default function Layout({ children }: LayoutProps<'/'>) {
+export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <HomeLayout
       {...baseOptions()}
       nav={{ component: <MarketingHeader /> }}
-      slots={{container: (props) => <MarketingContainer {...props} />  }}>
+      slots={{ container: (props) => <MarketingContainer {...props} /> }}
+    >
       {children}
     </HomeLayout>
   );

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "view",
+  "type": "registry:component",
+  "title": "View",
+  "description": "View component",
+  "registryDependencies": [],
+  "dependencies": [],
+  "category": "layout",
+  "files": [
+    {
+      "path": "components/ui/view.tsx",
+      "type": "registry:component",
+      "target": "components/ui/view.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport * as React from \"react\";\nimport { View as RNView, type ViewProps } from \"react-native\";\nexport type { ViewProps } from \"react-native\";\nconst View = React.forwardRef<RNView, ViewProps>(({ style, ...props }, ref) => {\n    const { theme } = useTheme();\n    const { colors } = THEME[theme];\n    return (<RNView ref={ref} style={[{ backgroundColor: colors.background }, style]} {...props}/>);\n});\nView.displayName = \"View\";\nexport default View;"
+    }
+  ]
+}

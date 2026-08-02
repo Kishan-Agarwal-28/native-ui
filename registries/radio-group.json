@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "radio-group",
+  "type": "registry:component",
+  "title": "Radio Group",
+  "description": "Radio Group component",
+  "registryDependencies": [],
+  "dependencies": ["@rn-primitives/radio-group"],
+  "category": "forms",
+  "files": [
+    {
+      "path": "components/ui/radio-group.tsx",
+      "type": "registry:component",
+      "target": "components/ui/radio-group.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport * as RadioGroupPrimitive from \"@rn-primitives/radio-group\";\nimport * as React from \"react\";\nimport { StyleSheet, type ViewStyle } from \"react-native\";\nconst RadioGroup = React.forwardRef<React.ElementRef<typeof RadioGroupPrimitive.Root>, React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>>(({ style, ...props }, ref) => {\n    const { theme } = useTheme();\n    const { spacing } = THEME[theme];\n    return (<RadioGroupPrimitive.Root ref={ref} style={StyleSheet.flatten([\n            {\n                gap: spacing.md,\n            },\n            style,\n        ])} {...props}/>);\n});\nRadioGroup.displayName = \"RadioGroup\";\nconst RadioGroupItem = React.forwardRef<React.ElementRef<typeof RadioGroupPrimitive.Item>, React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>>(({ style, disabled, ...props }, ref) => {\n    const { theme } = useTheme();\n    const { colors } = THEME[theme];\n    const baseStyle: ViewStyle = {\n        height: 20,\n        width: 20,\n        borderRadius: 10,\n        borderWidth: 1.5,\n        borderColor: colors.primary,\n        alignItems: \"center\",\n        justifyContent: \"center\",\n        opacity: disabled ? 0.5 : 1,\n    };\n    return (<RadioGroupPrimitive.Item ref={ref} disabled={disabled} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }} style={typeof style === \"function\"\n            ? (state) => StyleSheet.flatten([baseStyle, style(state)])\n            : StyleSheet.flatten([baseStyle, style])} {...props}>\n      <RadioGroupPrimitive.Indicator style={StyleSheet.flatten([\n            {\n                height: 10,\n                width: 10,\n                borderRadius: 5,\n                backgroundColor: colors.primary,\n            },\n        ])}/>\n    </RadioGroupPrimitive.Item>);\n});\nRadioGroupItem.displayName = \"RadioGroupItem\";\nexport { RadioGroup, RadioGroupItem };"
+    }
+  ]
+}

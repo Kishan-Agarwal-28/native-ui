@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "text",
+  "type": "registry:component",
+  "title": "Text",
+  "description": "Text component",
+  "registryDependencies": [],
+  "dependencies": [],
+  "category": "typography",
+  "files": [
+    {
+      "path": "components/ui/text.tsx",
+      "type": "registry:component",
+      "target": "components/ui/text.tsx",
+      "content": "import { THEME, useTheme } from \"@/lib/theme\";\nimport * as React from \"react\";\nimport { Text as RNText, type TextProps as RNTextProps } from \"react-native\";\nexport interface TextProps extends RNTextProps {\n}\nconst Text = React.forwardRef<RNText, TextProps>(({ style, ...props }, ref) => {\n    const { theme } = useTheme();\n    const { colors } = THEME[theme];\n    return (<RNText ref={ref} style={[{ color: colors.foreground }, style]} {...props}/>);\n});\nText.displayName = \"Text\";\nexport default Text;"
+    }
+  ]
+}

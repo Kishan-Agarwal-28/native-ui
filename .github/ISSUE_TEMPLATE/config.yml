@@ -1,0 +1,10 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & Discussion
+    url: https://github.com/[YOUR_ORG]/nativeui/discussions
+    about: >
+      Not a bug and not a feature request? 
+      Ask in Discussions — the community can help faster.
+  - name: 📖 Documentation
+    url: https://nativeui.qzz.io/docs
+    about: Check the docs first. Most questions are answered there.

@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "ui-dev",
+    "slug": "ui-dev",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "uidev",
+    "userInterfaceStyle": "automatic",
+    "ios": {},
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.testifywebdev.uidev"
+    },
+    "web": {
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#208AEF",
+          "android": {
+            "image": "./assets/images/splash-icon.png",
+            "imageWidth": 76
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6f08381d-ef89-443c-9749-15e67857673a"
+      }
+    }
+  }
+}

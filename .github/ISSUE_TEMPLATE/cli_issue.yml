@@ -1,0 +1,123 @@
+name: "⚡ CLI Issue"
+description: nativeui-cli init / add / remove / diff / list is misbehaving.
+title: "cli: "
+labels: ["cli", "bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        CLI issues are usually environment-specific. 
+        The more detail you give, the faster this gets fixed.
+
+  - type: dropdown
+    id: command
+    attributes:
+      label: Which command is broken?
+      options:
+        - nativeui-cli init
+        - nativeui-cli add
+        - nativeui-cli remove
+        - nativeui-cli diff
+        - nativeui-cli list
+        - nativeui-cli (general / install)
+    validations:
+      required: true
+
+  - type: textarea
+    id: exact-command
+    attributes:
+      label: Exact command you ran
+      render: shell
+      placeholder: "nativeui-cli add button card --overwrite"
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Full terminal output
+      description: Copy the entire output, not just the error line.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: native-ui-json
+    attributes:
+      label: Your native-ui.json (if relevant)
+      render: json
+      placeholder: |
+        {
+          "typescript": true,
+          "outputDir": "components/ui",
+          "runner": "npx expo",
+          "components": ["button", "input"]
+        }
+    validations:
+      required: false
+
+  - type: dropdown
+    id: package-manager
+    attributes:
+      label: Package manager
+      options:
+        - npm
+        - yarn
+        - pnpm
+        - bun
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: "Run `node --version` and paste the output"
+    validations:
+      required: true
+
+  - type: input
+    id: cli-version
+    attributes:
+      label: nativeui-cli version
+      placeholder: "Run `nativeui-cli --version` and paste the output"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - macOS
+        - Windows
+        - Linux
+    validations:
+      required: true
+
+  - type: input
+    id: os-version
+    attributes:
+      label: OS version
+      placeholder: "e.g. macOS 15.2, Windows 11, Ubuntu 24.04"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true
+        - label: I have a `native-ui.json` at my project root (except for `init` issues)
+          required: false
+        - label: I tried reinstalling nativeui-cli and the issue persists
+          required: true

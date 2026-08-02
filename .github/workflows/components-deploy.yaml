@@ -1,0 +1,51 @@
+name: Deploy Components to KV
+on:
+  push:
+    branches:
+      - prod/components
+    paths:
+      - 'apps/ui-dev/src/components/ui/**'
+  
+concurrency:
+  group: components-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Turborepo GitHub cache
+        uses: rharkor/caching-for-turbo@v2.3.13
+
+      - name: Build workspace dependencies
+        run: pnpm turbo run build --filter=@repo/components^...
+
+      - name: Generate Registries & Bulk JSON
+
+        run: node scripts/prepare-registry.mjs
+
+      - name: Deploy to Cloudflare KV
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # The Wrangler CLI command to upload the bulk file
+          command: kv:bulk put bulk-upload.json --namespace-id ${{ secrets.KV_NAMESPACE_ID }}

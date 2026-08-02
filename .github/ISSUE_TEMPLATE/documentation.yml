@@ -1,0 +1,51 @@
+name: "📖 Documentation"
+description: Something in the docs is wrong, missing, or unclear.
+title: "docs: "
+labels: ["documentation"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: What kind of docs issue?
+      options:
+        - Missing documentation
+        - Incorrect / outdated information
+        - Confusing explanation
+        - Missing code example
+        - Typo or formatting issue
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Page URL (if applicable)
+      placeholder: "https://nativeui.qzz.io/docs/customization"
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's wrong or missing?
+      placeholder: |
+        The customization page shows how to change colors but doesn't 
+        explain how to add a completely custom font family to the theme system.
+        I had to dig through source to figure it out.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: What should the docs say?
+      description: If you already know the correct info, paste it here — you might save yourself waiting for someone else to write it.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: pr
+    attributes:
+      label: Would you like to fix this yourself?
+      options:
+        - label: Yes — I'll open a PR with the documentation fix

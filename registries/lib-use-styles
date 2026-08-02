@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "lib-use-styles",
+  "type": "registry:component",
+  "title": "use-styles lib",
+  "description": "Helper hook to create themed styles",
+  "registryDependencies": [],
+  "dependencies": [],
+  "category": "typography",
+  "files": [
+    {
+      "path": "lib/use-styles.ts",
+      "type": "registry:component",
+      "target": "lib/use-styles.ts",
+      "content": "import { useMemo } from \"react\";\nimport { ImageStyle, StyleSheet, TextStyle, ViewStyle } from \"react-native\";\nimport { Theme, useTheme } from \"@/lib/theme\";\n\nexport type NamedStyles = Record<string, ViewStyle | TextStyle | ImageStyle>;\n\nconst useStyles = <T extends NamedStyles>(stylesheet: (theme: Theme) => T) => {\n  const { theme } = useTheme();\n  return useMemo(() => StyleSheet.create(stylesheet(theme)), [theme]);\n};\n\nexport default useStyles;"
+    }
+  ]
+}

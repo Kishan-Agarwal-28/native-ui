@@ -1,6 +1,6 @@
 ---
 title: Theme
-description: The shared theme configuration and provider powering all NativeUI components. Defines colors, spacing, radius, and typography for light, dark, and unspecified color schemes.
+description: The shared theme configuration and provider powering all NativeUI components. Defines colors, spacing, radius, and typography for light, dark, and unspecified color schemes, with built-in theme transitions and MMKV persistence.
 ---
 
 import { CommandTabs } from "@//components/command-tabs";
@@ -11,7 +11,7 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 ## Overview
 
-All NativeUI components consume a central `THEME` object and `useTheme` hook from `@/lib/theme`. The theme defines four tokens categories:
+All NativeUI components consume a central `THEME` object and `useTheme` hook from `@/lib/theme`. The theme defines four token categories:
 
 | Category | Description |
 |----------|-------------|
@@ -19,6 +19,8 @@ All NativeUI components consume a central `THEME` object and `useTheme` hook fro
 | `spacing` | Consistent spacing scale from `xs` (4) to `3xl` (32) |
 | `radius` | Border-radius scale from `sm` (4) to `full` (9999) |
 | `typography` | Font-size scale from `xs` (11) to `2xl` (24) |
+
+The theme provider is enhanced with **animated theme transitions** (using Skia and Reanimated) and **optional persistence** (using `react-native-mmkv`).
 
 ## Installation
 
@@ -37,7 +39,10 @@ All NativeUI components consume a central `THEME` object and `useTheme` hook fro
   <TabsContent value="manual">
     <Steps>
       <Step>
-        **No external dependencies required.**
+        **Install dependencies:**
+        ```bash
+        npx expo install @shopify/react-native-skia react-native-reanimated react-native-mmkv
+        ```
       </Step>
       <Step>
         **Copy and paste the following code into `lib/theme.tsx`.**
@@ -49,14 +54,14 @@ All NativeUI components consume a central `THEME` object and `useTheme` hook fro
 
 ## Setup
 
-Wrap your root layout with `ThemeProvider`:
+Wrap your root layout with `ThemeProvider`. You can optionally enable theme persistence with the `persist` prop:
 
 ```tsx title="app/_layout.tsx"
 import { ThemeProvider } from '@/lib/theme';
 
 export default function RootLayout({ children }) {
   return (
-    <ThemeProvider>
+    <ThemeProvider persist={true}>
       {children}
     </ThemeProvider>
   );
@@ -67,6 +72,7 @@ export default function RootLayout({ children }) {
 
 ```tsx
 import { THEME, useTheme } from '@/lib/theme';
+import { View, Text } from 'react-native';
 
 function MyComponent() {
   const { theme } = useTheme();
@@ -88,17 +94,25 @@ function MyComponent() {
 
 ## Changing the theme
 
-```tsx
-import { useTheme } from '@/lib/theme';
+We recommend using the dedicated `theme-toggle` component to smoothly transition between themes. If you prefer to implement your own toggle, you can use `triggerTransition`:
 
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+```tsx
+import { useThemeTransition } from '@/lib/theme';
+import { TouchableOpacity } from 'react-native';
+
+function CustomThemeToggle() {
+  const { triggerTransition } = useThemeTransition();
 
   return (
-    <Button
-      title={theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
-      onPress={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-    />
+    <TouchableOpacity onPress={(e) => {
+      triggerTransition({
+        x: e.nativeEvent.pageX,
+        y: e.nativeEvent.pageY,
+        type: 'circular'
+      });
+    }}>
+      <Text>Toggle Theme</Text>
+    </TouchableOpacity>
   );
 }
 ```
@@ -175,12 +189,12 @@ A static object containing the full theme config for each color scheme. Access i
 ### ThemeProvider
 
 ```tsx
-<ThemeProvider>
+<ThemeProvider persist={boolean}>
   {children}
 </ThemeProvider>
 ```
 
-Reads the device color scheme via `useColorScheme()` and sets the initial theme. Provides `theme` and `setTheme` via context.
+Provides `theme` and `setTheme` via context, enables Skia transitions, and can automatically persist the theme choice with `react-native-mmkv` if `persist={true}` is set.
 
 ### useTheme
 
@@ -191,4 +205,12 @@ const { theme, setTheme } = useTheme();
 | Return value | Type | Description |
 |--------------|------|-------------|
 | `theme` | `"light" \| "dark" \| "unspecified"` | Current active theme. |
-| `setTheme` | `Dispatch<SetStateAction<Theme>>` | Update the active theme. |
+| `setTheme` | `(theme: Theme) => void` | Update the active theme. |
+
+### useThemeTransition
+
+```ts
+const { triggerTransition } = useThemeTransition();
+```
+
+Use `triggerTransition` to smoothly animate the theme change. You must pass the coordinates `x` and `y` where the transition should originate.
