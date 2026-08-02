@@ -4,6 +4,7 @@ import ts from 'typescript';
 
 const root = process.cwd();
 const componentsDir = path.join(root, 'apps', 'ui-dev', 'src', 'components', 'ui');
+const libDir = path.join(root, 'apps', 'ui-dev', 'src', 'lib');
 const registriesDir = path.join(root, 'registries');
 
 const categoryByKey = {
@@ -28,6 +29,7 @@ const categoryByKey = {
   label: 'typography',
   progress: 'feedback',
   'radio-group': 'forms',
+  'refresh-control': 'feedback',
   select: 'forms',
   separator: 'layout',
   skeleton: 'feedback',
@@ -35,8 +37,11 @@ const categoryByKey = {
   spinner: 'feedback',
   switch: 'forms',
   table: 'layout',
+  text: 'typography',
   textarea: 'forms',
+  'theme-toggle': 'primitives',
   typography: 'typography',
+  view: 'layout',
 };
 
 const titleByKey = (key) =>
@@ -57,8 +62,11 @@ const stripComments = (input, fileName) => {
   return printer.printFile(sourceFile).trimEnd();
 };
 
-const getImports = (source) =>
-  [...source.matchAll(/from\s+['"]([^'"]+)['"]/g)].map((match) => match[1]);
+const getImports = (source) => {
+  const staticImports = [...source.matchAll(/from\s+['"]([^'"]+)['"]/g)].map((match) => match[1]);
+  const dynamicImports = [...source.matchAll(/import\s*\(\s*['"]([^'"]+)['"]\s*\)/g)].map((match) => match[1]);
+  return [...staticImports, ...dynamicImports];
+};
 
 const isExternalImport = (specifier) =>
   !specifier.startsWith('.') &&
@@ -69,16 +77,33 @@ const isExternalImport = (specifier) =>
 
 fs.mkdirSync(registriesDir, { recursive: true });
 
-const files = fs
+const componentFiles = fs
   .readdirSync(componentsDir)
   .filter((file) => file.endsWith('.tsx'))
-  .sort((a, b) => a.localeCompare(b));
+  .sort((a, b) => a.localeCompare(b))
+  .map(file => ({
+    file,
+    sourceDir: componentsDir,
+    key: path.basename(file, '.tsx'),
+    targetPath: `components/ui/${file}`
+  }));
 
+const libFiles = fs
+  .readdirSync(libDir)
+  .filter((file) => file.endsWith('.tsx') || file.endsWith('.ts'))
+  .sort((a, b) => a.localeCompare(b))
+  .map(file => ({
+    file,
+    sourceDir: libDir,
+    key: `lib-${path.basename(file, path.extname(file))}`,
+    targetPath: `lib/${file}`
+  }));
+
+const allItems = [...componentFiles, ...libFiles];
 const bulkData = [];
 
-for (const file of files) {
-  const key = path.basename(file, '.tsx');
-  const source = fs.readFileSync(path.join(componentsDir, file), 'utf8');
+for (const { file, sourceDir, key, targetPath } of allItems) {
+  const source = fs.readFileSync(path.join(sourceDir, file), 'utf8');
   const imports = getImports(source);
   const dependencies = [...new Set(imports.filter(isExternalImport))].sort((a, b) => a.localeCompare(b));
   const registryDependencies = [...new Set(imports.filter((specifier) => specifier.startsWith('@/components/ui/')).map((specifier) => path.basename(specifier)))].sort((a, b) => a.localeCompare(b));
@@ -86,17 +111,17 @@ for (const file of files) {
   const manifest = {
     $schema: 'https://nativeui.qzz.io/schema/registry-item.json',
     name: key,
-    type: 'registry:component',
+    type: targetPath.startsWith('lib/') ? 'registry:lib' : 'registry:component',
     title: titleByKey(key),
-    description: `${titleByKey(key)} component`,
+    description: `${titleByKey(key)} ${targetPath.startsWith('lib/') ? 'utility' : 'component'}`,
     registryDependencies,
     dependencies,
     category: categoryByKey[key] ?? 'layout',
     files: [
       {
-        path: `components/ui/${file}`,
-        type: 'registry:component',
-        target: `components/ui/${file}`,
+        path: targetPath,
+        type: targetPath.startsWith('lib/') ? 'registry:lib' : 'registry:component',
+        target: targetPath,
         content: stripComments(source, file),
       },
     ],

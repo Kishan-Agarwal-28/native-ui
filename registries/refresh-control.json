@@ -1,0 +1,18 @@
+{
+  "$schema": "https://nativeui.qzz.io/schema/registry-item.json",
+  "name": "refresh-control",
+  "type": "registry:component",
+  "title": "Refresh Control",
+  "description": "Refresh Control component",
+  "registryDependencies": [],
+  "dependencies": [],
+  "category": "feedback",
+  "files": [
+    {
+      "path": "components/ui/refresh-control.tsx",
+      "type": "registry:component",
+      "target": "components/ui/refresh-control.tsx",
+      "content": "import React from \"react\";\nimport { RefreshControlProps, RefreshControl as RNRefreshControl, ViewProps, } from \"react-native\";\nimport { THEME, useTheme } from \"@/lib/theme\";\nconst RefreshControl = React.forwardRef<RNRefreshControl, ViewProps & RefreshControlProps>(({ refreshing, onRefresh, colors, progressBackgroundColor, tintColor, titleColor, ...props }, ref) => {\n    const { theme } = useTheme();\n    const { colors: themeColors } = THEME[theme];\n    return (<RNRefreshControl ref={ref} refreshing={refreshing} onRefresh={onRefresh} tintColor={tintColor || themeColors.foreground} colors={colors || [themeColors.foreground]} progressBackgroundColor={progressBackgroundColor || themeColors.background} titleColor={titleColor || themeColors.foreground} {...props}/>);\n});\nRefreshControl.displayName = \"RefreshControl\";\nexport default RefreshControl;"
+    }
+  ]
+}
