@@ -1,0 +1,114 @@
+name: "✨ Feature Request"
+description: New component, CLI command, or theme capability you want added.
+title: "feat: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        NativeUI ships components you own. Before requesting a new one — 
+        ask yourself if you could add it yourself and open a PR instead.
+        That's the whole point.
+
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: What kind of feature?
+      options:
+        - New component
+        - New CLI command or flag
+        - Theme system improvement
+        - Existing component improvement
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: component-name
+    attributes:
+      label: Component or feature name
+      placeholder: "e.g. Tooltip, Popover, nativeui-cli upgrade"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: >
+        Don't start with the solution. Start with the pain. 
+        What are you trying to build and what's in your way right now?
+      placeholder: |
+        I'm building a settings screen and need contextual help text on form fields. 
+        Right now I have to wire up my own tooltip logic in every project from scratch.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How should this work? If it's a component, sketch out the API.
+      render: tsx
+      placeholder: |
+        <Tooltip content="This is your display name.">
+          <Input label="Username" />
+        </Tooltip>
+
+        // Ideally supports:
+        // - placement prop (top | bottom | left | right)
+        // - controlled open state
+        // - theme token for background/text colors
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What have you tried instead?
+      description: Workarounds, other libraries, DIY implementations — what's the current state?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: shadcn-equivalent
+    attributes:
+      label: Does shadcn/ui have an equivalent?
+      description: We use shadcn as a reference point for scope and API design.
+      options:
+        - "Yes — and I want a similar API"
+        - "Yes — but the API should differ for React Native"
+        - "No — this is RN-specific"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: shadcn-link
+    attributes:
+      label: shadcn/ui reference link (if applicable)
+      placeholder: "https://ui.shadcn.com/docs/components/tooltip"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: willing-to-pr
+    attributes:
+      label: Are you willing to open a PR for this?
+      options:
+        - "Yes — I'll implement it"
+        - "Yes — with guidance on where to start"
+        - "No — I'm requesting someone else builds it"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and this hasn't been requested before
+          required: true
+        - label: This fits the NativeUI philosophy — copy-paste, no lock-in, StyleSheet-only
+          required: true

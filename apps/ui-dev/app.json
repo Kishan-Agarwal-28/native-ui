@@ -11,7 +11,8 @@
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.testifywebdev.uidev"
     },
     "web": {
       "output": "static"
@@ -32,6 +33,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6f08381d-ef89-443c-9749-15e67857673a"
+      }
     }
   }
 }
