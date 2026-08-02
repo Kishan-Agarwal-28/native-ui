@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - prod/components
+      - prod/all
     paths:
       - 'apps/ui-dev/src/components/ui/**'
+      - 'apps/ui-dev/src/lib/**'
+      - 'scripts/prepare-registry.mjs'
   
 concurrency:
   group: components-deploy-${{ github.ref }}
@@ -37,11 +40,14 @@ jobs:
         uses: rharkor/caching-for-turbo@v2.3.13
 
       - name: Build workspace dependencies
-        run: pnpm turbo run build --filter=@repo/components^...
+        run: pnpm turbo run build --filter=ui-dev^...
 
       - name: Generate Registries & Bulk JSON
 
         run: node scripts/prepare-registry.mjs
+
+      - name: Install Wrangler globally
+        run: npm install -g wrangler
 
       - name: Deploy to Cloudflare KV
         uses: cloudflare/wrangler-action@v3
