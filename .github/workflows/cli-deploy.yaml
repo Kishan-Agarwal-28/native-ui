@@ -14,6 +14,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    environment: npm-publish
     permissions:
       id-token: write 
       contents: read
@@ -30,9 +31,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -41,8 +45,8 @@ jobs:
         uses: rharkor/caching-for-turbo@v2.3.13
 
       - name: Build CLI
-        run: pnpm turbo run build --filter=nativeui-cli
+        run: pnpm run build --filter nativeui-cli
 
       - name: Publish to npm
         working-directory: ./apps/cli
-        run: pnpm publish --provenance --no-git-checks
+        run: npm stage publish --provenance --no-git-checks
