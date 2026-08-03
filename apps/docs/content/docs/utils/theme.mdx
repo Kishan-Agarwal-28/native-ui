@@ -6,6 +6,7 @@ description: The shared theme configuration and provider powering all NativeUI c
 import { CommandTabs } from "@//components/command-tabs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@//components/ui/tabs";
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { ComponentSource } from "@/components/component-source";
 
 <div className="h-5"/>
 
@@ -46,7 +47,7 @@ The theme provider is enhanced with **animated theme transitions** (using Skia a
       </Step>
       <Step>
         **Copy and paste the following code into `lib/theme.tsx`.**
-        <ComponentSource name="theme" />
+        <ComponentSource name="lib-theme" />
       </Step>
     </Steps>
   </TabsContent>
