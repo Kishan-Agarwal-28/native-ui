@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nativeui.qzz.io/schema/registry-item.json",
+  "title": "Native UI Registry Item",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the item. This is used to identify the item in the registry. It should be unique for your registry."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "registry:component",
+        "registry:hook",
+        "registry:lib",
+        "registry:ui",
+        "registry:file"
+      ],
+      "description": "The type of the item. This is used to determine the type and target path of the item when resolved for a project."
+    },
+    "description": {
+      "type": "string",
+      "description": "The description of the item. This is used to provide a brief overview of the item."
+    },
+    "title": {
+      "type": "string",
+      "description": "The human-readable title for your registry item. Keep it short and descriptive."
+    },
+    "author": {
+      "type": "string",
+      "description": "The author of the item. Recommended format: username <url>"
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "An array of NPM dependencies required by the registry item.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "devDependencies": {
+      "type": "array",
+      "description": "An array of NPM dev dependencies required by the registry item.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "registryDependencies": {
+      "type": "array",
+      "description": "An array of registry items that this item depends on.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "category": {
+      "type": "string",
+      "description": "The category of the item (e.g., primitives)."
+    },
+    "files": {
+      "type": "array",
+      "description": "The main payload of the registry item. This is an array of files that are part of the registry item.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "The path to the file relative to the registry root."
+          },
+          "content": {
+            "type": "string",
+            "description": "The content of the file."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "registry:component",
+              "registry:hook",
+              "registry:lib",
+              "registry:ui",
+              "registry:file"
+            ],
+            "description": "The type of the file."
+          },
+          "target": {
+            "type": "string",
+            "description": "The target path of the file. This is the path to the file in the project."
+          }
+        },
+        "required": ["path", "type", "target", "content"]
+      }
+    }
+  },
+  "required": ["name", "type", "files"]
+}

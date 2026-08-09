@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nativeui.qzz.io/schema.json",
+  "title": "Native UI Configuration",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "typescript": {
+      "type": "boolean",
+      "description": "Whether the project uses TypeScript."
+    },
+    "outputDir": {
+      "type": "string",
+      "description": "The output directory where Native UI components will be generated."
+    },
+    "expoRunner": {
+      "type": "string",
+      "enum": ["pnpm", "npm", "yarn", "bun"],
+      "description": "The package manager used by the Expo project."
+    },
+    "baseDependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Base dependencies required by the Native UI components."
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "A list of Native UI components that have been installed."
+    }
+  },
+  "required": ["typescript", "outputDir", "expoRunner"]
+}
