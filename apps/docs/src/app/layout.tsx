@@ -1,12 +1,10 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
 import "./global.css";
-import { Inter } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { CookiesProvider } from "@/components/cookies-provider";
 import { SearchLink } from "fumadocs-ui/contexts/search";
-const inter = Inter({
-  subsets: ["latin"],
-});
 
 export default function Layout({ children }: LayoutProps<"/">) {
   const SEARCH_OPTIONS = {
@@ -17,8 +15,12 @@ export default function Layout({ children }: LayoutProps<"/">) {
   };
 
   return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
-      <body className="bg-white text-zinc-900 dark:bg-[#09090b] dark:text-zinc-100 min-h-screen">
+    <html
+      lang="en"
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="bg-white text-zinc-900 dark:bg-[#09090b] dark:text-zinc-100 min-h-screen overflow-x-hidden">
         <RootProvider search={SEARCH_OPTIONS}>
           <ThemeProvider defaultTheme="system">
             <CookiesProvider>{children}</CookiesProvider>
